@@ -306,68 +306,171 @@ int new_student_entry ()
 
 	s.set_admno ( next_admno ) ;
 
+READ_DATE_ADMITTED :
+	data = "" ;
 	read_date ( &data , 35 , 16 , 10 , 1 ) ;
+	if ( data == "-1" )
+	{
+		return 0 ;
+	}
 	s.set_date_admitted ( data ) ;
 
+READ_CLASS :
 	data = "" ;
 	string list_class[] = { "1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10" , "11" , "12" } ;
 	read_list ( &data , 35 , 18 , list_class , 12 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 16 ) ;
+		printf ( "          " ) ;
+		goto READ_DATE_ADMITTED;	
+	}
+	s.set_class_admitted ( data ) ;
 
+READ_STUDENT_NAME:
 	data = "" ;
 	read_data ( &data , 35 , 25 , 52 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 18 ) ;
+		printf ( "  " ) ;		
+		goto READ_CLASS;
+	}		
 	s.set_student_name ( data ) ;
 
+READ_STUDENT_GENDER:
 	data = "" ;
 	string gen_list[] = { "MALE" , "FEMALE" } ;
 	read_list ( &data , 35 , 27 , gen_list , 2 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 25 ) ;
+		printf ( "                                                      " ) ;			
+		goto READ_STUDENT_NAME;		
+	}
 	s.set_student_gender ( data ) ;
 
+READ_DOB:
 	data = "" ;
 	read_date ( &data , 35 , 29 , 10 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 27 ) ;
+		printf ( "       " ) ;			
+		goto READ_STUDENT_GENDER;		
+	}
 	s.set_dob ( data ) ;
-
 	s.set_age ( find_age ( data ) ) ;
 	gotoxy ( 35 , 31 ) ; cout << find_age ( data ) << endl ;
 
+READ_SKUL:
 	data = "" ;
-	read_data ( &data , 35 , 33 , 32 , 0 ) ;	
+	read_data ( &data , 35 , 33 , 32 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 29 ) ;
+		printf ( "          " ) ;			
+		goto READ_DOB ;			
+	}
 	s.set_skul_name ( data ) ;
 
+READ_FATHER_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 40 , 52 , 0 ) ;	
+	read_data ( &data , 35 , 40 , 52 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 33 ) ;
+		printf ( "                                  " ) ;			
+		goto READ_SKUL;			
+	}
 	s.set_father_name ( data ) ;
 
+READ_MOTHER_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 42 , 52 , 0 ) ;	
+	read_data ( &data , 35 , 42 , 52 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 40 ) ;
+		printf ( "                                            " ) ;			
+		goto READ_FATHER_NAME;			
+	}
 	s.set_mother_name ( data ) ;		
 
+READ_GUARD_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 44 , 52 , 0 ) ;	
+	read_data ( &data , 35 , 44 , 52 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 42 ) ;
+		printf ( "                                            " ) ;			
+		goto READ_MOTHER_NAME;			
+	}
 	s.set_guard_name ( data ) ;	
 
+READ_GUARD_RLTN:
 	data = "" ;
 	string rltn_list[] = { "FATHER" , "MOTHER" , "BROTHER" , "SISTER" , "UNCLE" , "AUNTY" , "OTHER" } ;
 	read_list ( &data , 35 , 46 , rltn_list , 7 ) 	;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 44 ) ;
+		printf ( "                                             " ) ;			
+		goto READ_GUARD_NAME;		
+	}
 	s.set_student_relation ( data ) ;	
 
+READ_ADDR_HNAME:
 	data = "" ;
-	read_data ( &data , 124 , 14 , 32 , 0 ) ;	
+	read_data ( &data , 124 , 14 , 32 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 35 , 46 ) ;
+		printf ( "         " ) ;			
+		goto READ_GUARD_RLTN;			
+	}
 	s.set_addr_hname( data ) ;
 
+READ_ADDR_PLACE:
 	data = "" ;
-	read_data ( &data , 124 , 16 , 22 , 0 ) ;	
+	read_data ( &data , 124 , 16 , 22 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 124 , 14 ) ;
+		printf ( "                              " ) ;			
+		goto READ_ADDR_HNAME;			
+	}
 	s.set_addr_place ( data ) ;
 
+READ_ADDR_POST:
 	data = "" ;
-	read_data ( &data , 124 , 18 , 22 , 0 ) ;	
+	read_data ( &data , 124 , 18 , 22 , 0 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 124 , 16 ) ;
+		printf ( "                              " ) ;			
+		goto READ_ADDR_PLACE;			
+	}
 	s.set_addr_post ( data ) ;						
 
+READ_ADDR_PIN:
 	data = "" ;
-	read_data ( &data , 124 , 20 , 8 , 1 ) ;	
+	read_data ( &data , 124 , 20 , 8 , 1 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 124 , 18 ) ;
+		printf ( "                              " ) ;			
+		goto READ_ADDR_POST;			
+	}
 	s.set_addr_pin ( data ) ;
 
+READ_PHONE:
 	data = "" ;
-	read_data ( &data , 124 , 22 , 13 , 1 ) ;	
+	read_data ( &data , 124 , 22 , 13 , 1 ) ;
+	if ( data == "-1" )
+	{
+
+		goto READ_ADDR_PIN;			
+	}
 	s.set_phone ( data ) ;
 
 	// cout << data << endl ;

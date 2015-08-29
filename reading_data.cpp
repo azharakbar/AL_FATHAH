@@ -83,6 +83,8 @@ extern void read_date ( string* d , int x , int y , int max_size , int today )
 
 		i = 0 ;
 
+		gotoxy ( x , y ) ;
+
 		while ( (int)data_  != 13 )
 		{
 			data_ = _getch();
@@ -91,6 +93,15 @@ extern void read_date ( string* d , int x , int y , int max_size , int today )
 			{	
 				data_  = 8 ;
 				continue ;
+			}
+
+			if ( (int)data_ == 27 )
+			{
+				*d = "-1" ;
+				gotoxy ( x , y ) ;
+				for ( int j = 0 ; j <= i ; ++j )
+					printf(" ") ;
+				return ;
 			}
 
 			if ( !i && ( (int)data_ == 84 || (int)data_ == 116 ) && today )
@@ -185,7 +196,7 @@ int date_validation ( string data , int i , char ch )
 		if ( data[i-3] == '3' && data[i-2] == '1' && data[i-1] == '0' &&  ( ch == '1' || ch == '3' || ch == '5' || ch == '7' || ch == '8' ) )
 			return 1 ;
 
-		if ( data[i-3] == '3' && data[i-2] == '0' && data[i-1] == '0' &&  ( ch == '1' || ch == '2' || ch == '3' || ch == '4' || ch == '5' || ch == '6' || ch == '7' || ch == '8' || ch == '9' ) )
+		if ( data[i-3] == '3' && data[i-2] == '0' && data[i-1] == '0' &&  ( ch == '1' || ch == '3' || ch == '4' || ch == '5' || ch == '6' || ch == '7' || ch == '8' || ch == '9' ) )
 			return 1 ;		
 
 		if ( data[i-3] == '3' && data[i-2] == '0' && data[i-1] == '1' &&  ( ch == '0' || ch == '1' || ch == '2' ) )
@@ -252,6 +263,15 @@ extern void read_data ( string* d , int x , int y , int max_size , int number )
 				continue ;
 			}
 
+			if ( (int)data_ == 27 )
+			{
+				*d = "-1" ;
+				gotoxy ( x , y ) ;
+				for ( int j = 0 ; j <= i ; ++j )
+					printf(" ") ;
+				return ;
+			}			
+
 			if ( (int)data_  != 8 && (int)data_  != 13 ) 
 				if ( (data_ == ' ' && data[i-1] != ' ' && i != 0) || data_ != ' ' )
 					if ( number == 2 || ( number == 1 && isdigit(data_) ) || ( !number &&  ( isalpha(data_) || data_ == ' ' ) ) )
@@ -308,6 +328,12 @@ extern void read_char ( char* d , int x , int y , char items[] , int size )
 				data_  = 8 ;
 				continue ;
 			}
+
+			if ( (int)data_ == 27 )
+			{
+				*d = '0' ;
+				return ;
+			}			
 
 			if ( (int)data_  != 8 && (int)data_  != 13 ) 
 				if ( is_available ( items , size , toupper(data_) ) )
@@ -402,6 +428,15 @@ extern void read_list ( string* data , int x , int y , string list[] , int size 
 
 			if ( ch != -32 && ch != 0 ) str = "" ;
 
+		}
+
+		if ( a == "27" )
+		{
+			*data = "-1" ;
+			gotoxy ( x , y ) ;
+			for ( int j = 0 ; j <= list[pos].length() ; ++j )
+				printf(" ") ;			
+			return ;
 		}
 
 		if ( a == "-3272" )							// UP KEY
