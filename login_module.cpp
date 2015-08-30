@@ -379,6 +379,16 @@ extern void startup_tasks ( void* params )
 
 	next_admno = get_next_adm_no () ;
 
+	fp = fopen ( "fee_db.bin" , "r" ) ;
+
+	if ( fp == NULL )
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "fee_db.bin" , "w" ) ;
+	}
+
+	fclose ( fp ) ;	
+
 }
 
 extern void blink_text ( void* text )

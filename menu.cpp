@@ -5,6 +5,8 @@ using namespace std ;
 
 extern int main_menu () ;
 extern int student_menu () ;
+extern int fee_menu () ;
+
 extern void gotoxy ( int , int ) ;
 extern void header () ;
 extern int menu_control ( int , int , int ) ;
@@ -61,7 +63,7 @@ extern int student_menu ()
 	gotoxy(72 , 13) ;
 	cout<<"STUDENT DATABASE CENTRAL"<<endl;
 	gotoxy(71,14);
-	for ( i = 1 ; i <= strlen ("STUDENT DATABASE CENTRAL")+1 ; ++i )
+	for ( i = 1 ; i <= strlen ("STUDENT DATABASE CENTRAL")+2 ; ++i )
 		cout<<char(205);		//11
 	cout << endl ;
 	
@@ -86,6 +88,47 @@ extern int student_menu ()
 	cout<<endl;	
 	
 	int pos = menu_control ( 60 , 18 , 26 ) ;
+
+	pos = ( pos + 2 ) / 2 ;
+
+	return pos ;
+}
+
+
+
+extern int fee_menu ()
+{
+
+	//Sleep ( 250 ) ;
+	int i=0;
+
+	header();
+	gotoxy(73 , 13) ;
+	cout<<"FEE COLLECTION CENTRAL"<<endl;
+	gotoxy(72,14);
+	for ( i = 1 ; i <= strlen ("FEE COLLECTION CENTRAL")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+	
+	gotoxy(58,16);
+	for(i=0;i<51;++i)cout<<(char)220;
+	cout<<endl;
+	
+	gotoxy(58,17); cout<<(char)219<<"                                                 "<<(char)219<<endl;
+	gotoxy(58,18); cout<<(char)186<<"     1.  FEE PAYMENT                             "<<(char)186<<endl;
+	gotoxy(58,19); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,20); cout<<(char)186<<"     2.  FEE DEFAULTERS                          "<<(char)186<<endl;
+	gotoxy(58,21); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,22); cout<<(char)186<<"     3.  FEE COLLECTION STATISTICS               "<<(char)186<<endl;
+	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,24); cout<<(char)186<<"     4.  MAIN MENU                               "<<(char)186<<endl;
+	gotoxy(58,25); cout<<(char)219<<"                                                 "<<(char)219<<endl;
+	gotoxy(58,26);
+	for(i=0;i<51;++i)
+		cout<<(char)223;
+	cout<<endl;	
+	
+	int pos = menu_control ( 60 , 18 , 24 ) ;
 
 	pos = ( pos + 2 ) / 2 ;
 

@@ -30,6 +30,8 @@ extern void header () ;
 extern int  main_menu () ;
 extern int student_menu () ;
 extern void student_central_control ( int );
+extern int fee_menu () ;
+extern void fee_central_control ( int ) ;
 
 struct msg_list_main
 {
@@ -155,7 +157,7 @@ NOW :
 				student_central_control ( student_menu () ) ;
 				break ;
 			case 2:
-				gotoxy ( 0 , 0 ); cout << "option 2" ;
+				fee_central_control ( fee_menu () ) ;
 				break ;
 			case 3:
 				gotoxy ( 0 , 0 ); cout << "option 3" ;

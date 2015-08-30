@@ -30,26 +30,27 @@ struct address
 
 class student_data 
 {
-		int adm_no ;
-		string date_admitted ;
-		string skul_name ;
+private:
+	int adm_no ;
+	string date_admitted ;
+	string skul_name ;
 
-		string student_name ;
-		string father_name ;
-		string mother_name ;
-		string guard_name ;
-		char gender ;
-		char relation ;
+	string student_name ;
+	string father_name ;
+	string mother_name ;
+	string guard_name ;
+	char gender ;
+	char relation ;
 
-		address addr ;
-		string phone ;
+	address addr ;
+	string phone ;
 
-		string dob ;
-		int age ;
+	string dob ;
+	int age ;
 
-		string class_admitted ;
+	string class_admitted ;
 	
-	public :		
+public:
 		student_data () 
 		{
 			adm_no = 0 ;
@@ -472,13 +473,6 @@ READ_PHONE:
 		goto READ_ADDR_PIN;			
 	}
 	s.set_phone ( data ) ;
-
-	// cout << data << endl ;
-
-
-
-
-//	cout << " in main " << data ;
 
 	FILE* fp ;
 
