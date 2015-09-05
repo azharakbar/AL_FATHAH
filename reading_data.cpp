@@ -3,17 +3,21 @@
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
+#include <vector>
 
 using namespace std ;
 
 extern void gotoxy ( int , int ) ;
 extern void read_data ( char data[] , int x , int y , int max_size , int special ) ;
 extern void read_data ( string* data , int x , int y , int max_size , int number ) ;
+extern void read_data_continuous ( string* d , int x , int y , int max_size , int number ) ;
 extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
+extern void read_vector ( string* data , int x , int y , vector<string> list , int* pos ) ;
 
 extern char sdate[20] ;
+extern int read_ctr = 0 ;
 
 int date_validation ( string , int i , char ch ) ;
 int is_available ( char items[] , int size , char d ) ;
@@ -246,7 +250,7 @@ extern void read_data ( string* d , int x , int y , int max_size , int number )
 {
 		int i = 0 ;
 		
-		string data = *d ;
+		string data = "a" ;
 		data.reserve( max_size ) ;
 		char data_ = 8 ;
 
@@ -301,7 +305,12 @@ extern void read_data ( string* d , int x , int y , int max_size , int number )
 			
 		}
 		data[i] = '\0';
-	
+
+		for ( i = 0 ; data[i] != '\0' ; ++i )
+		{
+			*d += data[i] ;
+		}
+
 }
 
 
@@ -451,4 +460,163 @@ extern void read_list ( string* data , int x , int y , string list[] , int size 
 		}
 	}
 	*data = list[pos] ;	
+}
+
+extern void read_vector ( string* data , int x , int y , vector<string> list , int* p )
+{
+	string str = "" ;
+	string a = "" ;
+	char ch  ;
+	
+	char s[5] = "" ;
+	int b = 1 ;
+
+	int pos = 0 ;
+
+	while ( a != "13" )
+	{
+		gotoxy ( x , y ) ;
+		cout << "                " ;
+		gotoxy ( x , y ) ;
+		cout << list[pos] ;
+
+		b = 1 ;
+		while ( b )
+		{
+			ch=_getch();
+
+			if ( b ) b = 0 ;
+			if ( ch == -32 || ch == 0 ) b = 1 ;
+
+			str += itoa(ch,s,10) ;
+
+			a = str ;
+
+			if ( b == 1  && ch != -32 && ch != 0 ) { b = 0 ; str = "" ; }
+
+			if ( ch != -32 && ch != 0 ) str = "" ;
+
+		}
+
+		if ( a == "27" )
+		{
+			*data = "-1" ;
+			gotoxy ( x , y ) ;
+			for ( int j = 0 ; j <= list[pos].length() ; ++j )
+				printf(" ") ;			
+			return ;
+		}
+
+		if ( a == "-3272" )							// UP KEY
+		{
+			if ( pos-1 < 0 ) pos = list.size() - 1 ;
+			else --pos ;						
+		}
+		if ( a == "-3280" )							// DOWN KEY
+		{				
+			if ( pos + 1 >= list.size() ) pos = 0 ;
+			else ++pos ;
+		}
+	}
+	*data = list[pos] ;	
+	*p = pos ;
+}
+
+extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n ) 
+{
+		
+		if (!(*n)) { read_ctr = 0 ; gotoxy ( x , y ) ; }
+
+		string data = *d ;
+		data.reserve( max_size ) ;
+		char data_ = 8 ;
+
+		if ( read_ctr == max_size-2 )
+		{
+			gotoxy ( x+(max_size-3) , y ) ;
+		}
+		else gotoxy ( x+(read_ctr) , y ) ;
+
+
+			data_ = _getch();
+
+			if ( *n && (int)data_ == 13 )
+			{
+				*d = "done" ;
+				return ;
+			}
+			
+			if ( !(*n) && (int)data_  == 13 ) 
+			{	
+				data_  = 8 ;
+				return ;
+			}
+
+			if ( (int)data_ == 27 )
+			{
+				*d = "-1" ;
+				read_ctr = 0 ;
+				*n = 0 ;
+				return ;
+			}
+
+			if ( !((data_ >= (int)'0' && data_ <= (int)'9') || data_ == 8 || data_ == 13 ) )
+			return ;			
+
+			if ( (int)data_  != 8 && (int)data_  != 13 ) 
+				if ( (data_ == ' ' && data[read_ctr-1] != ' ' && read_ctr != 0) || data_ != ' ' )
+					if ( number == 2 || ( number == 1 && isdigit(data_) ) || ( !number &&  ( isalpha(data_) || data_ == ' ' ) ) )
+						if ( read_ctr != max_size-2 )
+						{
+							data[read_ctr++] = toupper(data_)  ;
+							*d = data ;
+						}
+
+			if ( read_ctr == max_size-2 && (int)data_  != 8 )
+			{
+				return ;
+			}
+				
+			if ( (int)data_  == 8 )
+			{
+				if ( read_ctr != 0 )
+				{
+						--read_ctr ;
+						*n /= 10 ;
+						gotoxy ( x , y ) ; 
+						cout << "     " ;
+						gotoxy ( x , y ) ;
+						if(*n)cout << *n ;		
+						else cout <<" " ;
+				}
+				else
+						read_ctr = 0 ;
+				return ;
+			}		
+		
+/*			if ( read_ctr >= 0 && (int)data_ != 13 ) 
+			{
+				gotoxy ( x , y ) ;
+				 for ( int j=0 ; j<read_ctr ; ++j)
+				 {
+				 		gotoxy ( 0 , 1+j ) ;
+				 		cout << " j = " << j << " data[j] = " << data[j] << endl ;
+				 		gotoxy ( x+j , y ) ;
+						printf("%c",data[j]);
+				 }
+			}*/
+			
+		
+		data[read_ctr] = '\0';
+
+	if ( n != NULL )
+	{
+		*n *= 10 ;
+		*n += ( data_ - 48 ) ;
+		gotoxy ( x , y ) ;
+		if(*n)cout << *n ;		
+		else cout <<" " ;
+	}
+	*d = data ;
+
 }

@@ -1,17 +1,24 @@
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <stdio.h>
+#include <windows.h>
 
 using namespace std ;
+
+class student_data ;
 
 extern void gotoxy ( int , int ) ;
 extern void header () ;
 extern int get_next_adm_no () ;
 extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
-extern void read_data ( string* data , int x , int y , int max_size , int special ) ;
+extern void read_data ( string* data , int x , int y , int max_size , int number ) ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
 extern int  find_age  ( string data ) ;
+extern void fee_student_init ( int admno , char [] ) ;
+
+extern int show_student_data_brief ( int admno ) ;
 
 extern int next_admno ;
 
@@ -19,86 +26,84 @@ int new_student_entry () ;
 int edit_student_entry () ;
 int search_student_entry () ;
 int student_mark_entry () ;
+student_data search_student_file ( int* admno ) ;
+
+extern void convert ( string d , char cnvt[] ) ;
 
 struct address
 {
-	string hname ;
-	string place ;
-	string post ;
-	string pin ;
+	char hname[30] ;
+	char place[20] ;
+	char post[20] ;
+	char pin[10] ;
 };
 
 class student_data 
 {
-private:
+public:
 	int adm_no ;
-	string date_admitted ;
-	string skul_name ;
+	char date_admitted[12] ;
+	char skul_name[30] ;
 
-	string student_name ;
-	string father_name ;
-	string mother_name ;
-	string guard_name ;
+	char student_name[50] ;
+	char father_name[50] ;
+	char mother_name[50] ;
+	char guard_name[50] ;
 	char gender ;
 	char relation ;
 
 	address addr ;
-	string phone ;
+	char phone[15] ;
 
-	string dob ;
+	char dob[12] ;
 	int age ;
 
-	string class_admitted ;
+	char class_admitted[5] ;
 	
-public:
+
 		student_data () 
 		{
 			adm_no = 0 ;
 			gender = 'M' ;
 			relation = 'P' ;
 			age = 0 ;
-			date_admitted = "NT ASSIGNED" ;
-			skul_name = "NT ASSIGNED" ;
-			student_name = "NT ASSIGNED" ;
-			father_name = "NT ASSIGNED" ;
-			mother_name = "NT ASSIGNED" ;
-			guard_name = "NT ASSIGNED" ;
-			phone = "NT ASSIGNED" ;
-			dob = "NT ASSIGNED" ;
-			class_admitted = "NT ASSIGNED" ;
-			addr.hname = "NT ASSIGNED";
-			addr.place = "NT ASSIGNED";
-			addr.post = "NT ASSIGNED";
-			addr.pin = "010101" ;
-			date_admitted.reserve(12) ;
-			skul_name.reserve(30) ;
-			student_name.reserve(50) ;
-			father_name.reserve(50) ;
-			mother_name.reserve(50) ;
-			guard_name.reserve(50) ;
-			phone.reserve(15) ;
-			dob.reserve(12) ;
-			class_admitted.reserve(5) ;	
-			addr.hname.reserve (30) ;
-			addr.place.reserve (20) ;
-			addr.post.reserve (20)  ;
-			addr.pin.reserve(10) ;
+			strcpy ( date_admitted , "NT ASSIGNED"  );
+			strcpy ( skul_name , "NT ASSIGNED"  );
+			strcpy ( student_name , "NT ASSIGNED"  );
+			strcpy ( father_name , "NT ASSIGNED"  );
+			strcpy ( mother_name , "NT ASSIGNED"  );
+			strcpy ( guard_name , "NT ASSIGNED"  );
+			strcpy ( phone , "NT ASSIGNED"  );
+			strcpy ( dob , "NT ASSIGNED"  );
+			strcpy ( class_admitted , "NT ASSIGNED"  );
+			strcpy ( addr.hname , "NT ASSIGNED ");
+			strcpy ( addr.place ,"NT ASSIGNED ");
+			strcpy ( addr.post , "NT ASSIGNED ");
+			strcpy ( addr.pin , "010101" );
 		}
 		void set_admno ( int d )
 		{
 			adm_no = d ;
 		}
+		int get_admno () 
+		{
+			return adm_no ;
+		}
 		void set_date_admitted ( string d )
 		{
-			date_admitted.assign(d) ;
+			convert ( d , date_admitted );
+
+			//date_admitted.assign(d) ;
 		}
 		void set_skul_name ( string d )
 		{
-			skul_name.assign (d) ;
+			convert ( d , skul_name );
+			//skul_name.assign (d) ;
 		}		
 		void set_student_name ( string d )
 		{
-			student_name.assign(d) ;
+			convert ( d , student_name );
+			//student_name.assign(d) ;
 		}
 		void set_student_gender ( string d )
 		{
@@ -109,11 +114,13 @@ public:
 		}		
 		void set_father_name ( string d )
 		{
-			father_name.assign(d) ;
+			convert ( d , father_name );
+			//father_name.assign(d) ;
 		}
 		void set_mother_name ( string d )
 		{
-			mother_name.assign(d) ;
+			convert ( d , mother_name );
+			//mother_name.assign(d) ;
 		}
 		void set_student_relation ( string d )
 		{
@@ -134,31 +141,38 @@ public:
 		}	
 		void set_guard_name ( string d )
 		{
-			guard_name.assign(d) ;
+			convert ( d , guard_name );
+			//guard_name.assign(d) ;
 		}							
 		void set_dob ( string d )
 		{
-			dob.assign(d) ;
+			convert ( d , dob );
+			//dob.assign(d) ;
 		}
 		void set_class_admitted ( string d )
 		{
-			class_admitted.assign(d) ;
+			convert ( d , class_admitted );
+			//class_admitted.assign(d) ;
 		}
 		void set_addr_hname ( string d )
 		{
-			addr.hname.assign(d) ;
+			convert ( d , addr.hname );
+			//addr.hname.assign(d) ;
 		}		
 		void set_addr_place ( string d )
 		{
-			addr.place.assign(d) ;
+			convert ( d , addr.place );
+			//addr.place.assign(d) ;
 		}		
 		void set_addr_post ( string d )
 		{
-			addr.post.assign(d) ;
+			convert ( d , addr.post );
+			//addr.post.assign(d) ;
 		}		
 		void set_addr_pin ( string d )
 		{
-			addr.pin = d ;
+			convert ( d , addr.pin );
+			//addr.pin = d ;
 		}			
 		void set_age ( int d )
 		{
@@ -166,10 +180,33 @@ public:
 		}		
 		void set_phone ( string d )
 		{
-			phone.assign ( d ) ;
+			convert ( d , phone );
+			//phone.assign ( d ) ;
+		}
+		void disp ()
+		{
+			system("cls") ;
+			cout << endl << adm_no ;
+			cout << endl << date_admitted ;
+			cout << endl << skul_name ;
+			cout << endl << student_name ;
+			cout << endl << father_name ;
+			cout << endl << mother_name ;
+			cout << endl << guard_name ;
+			cout << endl << gender ;
+			cout << endl << relation ;
+			cout << endl << addr.hname ;
+			cout << endl << addr.place ;
+			cout << endl << addr.post ;
+			cout << endl << addr.pin ;
+			cout << endl << phone ;
+			cout << endl << dob ;
+			cout << endl << age ;
+			cout << endl << class_admitted ;
+
+			cin.get () ;
 		}	
 };
-
 
 extern void student_central_control ( int choice )
 {
@@ -336,7 +373,7 @@ READ_STUDENT_NAME:
 		gotoxy ( 35 , 18 ) ;
 		printf ( "  " ) ;		
 		goto READ_CLASS;
-	}		
+	}
 	s.set_student_name ( data ) ;
 
 READ_STUDENT_GENDER:
@@ -469,7 +506,6 @@ READ_PHONE:
 	read_data ( &data , 124 , 22 , 13 , 1 ) ;
 	if ( data == "-1" )
 	{
-
 		goto READ_ADDR_PIN;			
 	}
 	s.set_phone ( data ) ;
@@ -485,6 +521,8 @@ READ_PHONE:
 	}
 
 	fclose ( fp ) ;
+
+	fee_student_init ( s.get_admno() , s.date_admitted ) ;
 
 	cin.get () ;
 
@@ -528,4 +566,85 @@ extern int get_next_adm_no ()
 	x = ( len / sizeof ( student_data ) ) ;
 	++x ;
 	return x ;
+}
+
+student_data search_student_file ( int* admno )
+{
+	student_data x ;
+	int y = 1 ;
+
+	fstream file ;
+
+	file.open ( "stud_db.bin" , ios::in|ios::binary ) ;
+
+	while ( y < next_admno )
+	{
+		file.read((char*)&x , sizeof(student_data)) ;
+		if ( x.get_admno() == *admno )
+		{
+			file.close () ;	
+			return x ;	
+		}
+		++y ;
+	}
+
+	file.close () ;
+
+	*admno = -1 ;
+	
+	return x ;
+
+}
+
+extern int show_student_data_brief ( int admno ) 
+{
+	static int clean = 0 ;
+
+	student_data s ;
+
+	if ( admno )
+		s = search_student_file ( &admno ) ;
+
+	if ( clean == 1 )
+	{
+		gotoxy ( 70 , 17 ) ;
+		printf ("                             ") ;
+		if ( admno == 0 ) clean = 0 ;		
+	}
+	if ( clean == 2 )
+	{
+		gotoxy ( 6 , 16 ) ;
+		printf ("                                                                                       ") ;
+		gotoxy ( 6 , 18 ) ;
+		printf ("                                  ") ;
+		gotoxy ( 6 , 20 ) ;
+		printf ("                                      ") ;
+		gotoxy ( 90 , 18 ) ;
+		printf ("                                                   ") ;
+		if ( admno == 0 ) clean = 0 ;
+	}
+
+	if ( admno == 0 ) return 0 ;
+
+
+
+	if ( admno == -1 ) 
+	{
+		gotoxy ( 70 , 17 ) ;
+		cout << "***** STUDENT NOT FOUND *****" ;
+		clean = 1 ;
+		return 0 ;
+	}
+	else
+	{
+		gotoxy ( 6 , 16 ) ;
+		cout << "** NAME :                  " << s.student_name << endl ;
+		gotoxy ( 6 , 18 ) ;
+		cout << "** CLASS :                 " << s.class_admitted << endl ;
+		gotoxy ( 6 , 20 ) ;
+		cout << "** DATE OF ADMISSION :     " << s.date_admitted << endl ;
+		clean = 2 ;
+		return 1 ;
+	}
+
 }
