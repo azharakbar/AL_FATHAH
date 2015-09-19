@@ -10,8 +10,11 @@ using namespace std ;
 
 extern void header () ;
 extern void gotoxy ( int , int ) ;
+extern void  authenticate ( char login_entered[] ) ;
+extern void write_login_details ( char user[] , char pwd[] ) ;
 extern int  menu_control ( int , int , int , int esc = 0 ) ;
 extern void general_tasks ( string , int* data = 0 ) ;
+extern void read_data ( char data[] , int x , int y , int max_size , int special ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void display_msg_static ( string msg )  ;
@@ -19,6 +22,7 @@ extern void display_msg_static ( string msg )  ;
 extern void admin_central_control ( int ) ;
 
 int change_fee_structure () ;
+int change_login_credits () ;
 
 extern void admin_central_control ( int choice ) 
 {
@@ -26,7 +30,7 @@ extern void admin_central_control ( int choice )
 	switch ( choice )
 	{
 		case 1 :
-			//x = new_student_entry () ;
+			x = change_login_credits () ;
 			break ;
 		case 2 :
 			x = change_fee_structure () ;
@@ -78,7 +82,7 @@ int change_fee_structure ()
 
 	int pos = menu_control ( 65 , 17 , 21 , 1 ) ;
 
-	if ( pos == 0 ) return 0 ;
+	if ( pos == -1 ) return 0 ;
 
 	pos = (pos+2)/2 ;	
 
@@ -152,5 +156,68 @@ int change_fee_structure ()
 
 	return 0 ;
 
-	//cin.get () ;
+}
+
+int change_login_credits () 
+{
+	int i = 0 , j = 0 ;
+	char username[100] = "" , password[100] = "" , pwd[100] = "" , login_entered[200] = "" ;
+
+	header();
+	gotoxy(72 , 8) ;
+	cout<<"CHANGE LOGIN CREDENTIALS"<<endl;
+	gotoxy(71,9);
+	for ( i = 1 ; i <= strlen ("CHANGE LOGIN CREDENTIALS")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;		
+
+	gotoxy ( 63 , 15 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+	for ( j = 0 ; j <= 12 ; ++j )
+	{	
+		gotoxy ( 63 , 16+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 40 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 63 , 16+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	//gotoxy ( 71 , 14) ; cout << "** CURRENT FEE STRUCTURE **" ;
+	gotoxy ( 64 , 17 ) ; cout << "   CURRENT USERNAME  : " << endl ;	
+	gotoxy ( 64 , 19 ) ; cout << "   CURRENT PASSWORD  : " << endl ;
+	gotoxy ( 66 , 21 ) ; for ( i = 0 ; i < 37 ; ++i ) cout << (char)196 ; cout << endl ;
+	gotoxy ( 64 , 23 ) ; cout << "   NEW USERNAME      : " << endl ;
+	gotoxy ( 64 , 25 ) ; cout << "   NEW PASSWORD      : " << endl ;
+	gotoxy ( 64 , 27 ) ; cout << "   CONFIRM PASSWORD  : " << endl ;
+
+	read_data ( username , 87 , 17 , 20 , 0 ) ;	
+	read_data ( password , 87 , 19 , 20 , 1 ) ;
+
+	strcpy ( login_entered , username ) ;
+	strcat ( login_entered , " " ) ;
+	strcat ( login_entered , password ) ;	
+
+	strcpy ( username , "" ) ;
+	strcpy ( password , "" ) ;
+
+	read_data ( username , 87 , 23 , 20 , 0 ) ;	
+	read_data ( password , 87 , 25 , 20 , 1 ) ;
+	read_data ( pwd , 87 , 27 , 20 , 1 ) ;	
+
+	authenticate ( login_entered ) ;
+
+	if ( !strcmp ( login_entered , "success") && !strcmp ( password , pwd ) )
+	{
+		write_login_details ( username , password ) ;
+		display_msg_static ( "===== LOGIN CREDENTIALS CHANGED SUCCESSFULLY =====");
+	}
+	else
+		display_msg_static ( "===== LOGIN CREDENTIALS CHANGE FAILED =====");
+
+	cin.get () ;
+
+	return 0 ;
 }

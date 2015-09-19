@@ -12,6 +12,7 @@
 using namespace std ;
 
 extern void login_module ( void* params ) ;
+extern void retrieve_login_details ( void* param ) ;	// remove this at the end of the project
 extern void authenticate ( void* text ) ;
 extern void gotoxy ( int x , int y ) ;
 extern void display_time ( void* params ) ;
@@ -32,6 +33,8 @@ extern int student_menu () ;
 extern void student_central_control ( int );
 extern int fee_menu () ;
 extern void fee_central_control ( int ) ;
+extern int admin_menu () ;
+extern void admin_central_control ( int ) ;
 
 struct msg_list_main
 {
@@ -143,6 +146,7 @@ int main ()
 NOW :
 
 	startup_tasks ( NULL ) ;		// delete this line when invalidating the NOW label
+
 	logged_in = true ;	
 
 	int pos = 0 ;
@@ -160,7 +164,7 @@ NOW :
 				fee_central_control ( fee_menu () ) ;
 				break ;
 			case 3:
-				gotoxy ( 0 , 0 ); cout << "option 3" ;
+				admin_central_control ( admin_menu () ) ;
 				break ;
 			case 4:
 				gotoxy ( 0 , 0 ); cout << "option 4" ;

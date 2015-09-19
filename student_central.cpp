@@ -13,12 +13,18 @@ extern void header () ;
 extern int get_next_adm_no () ;
 extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
 extern void read_data ( string* data , int x , int y , int max_size , int number ) ;
+extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
+extern void hit_enter ( int x , int y ) ;
 extern int  find_age  ( string data ) ;
 extern void fee_student_init ( int admno , char [] ) ;
+extern string get_student_name ( int admno ) ;
+extern string get_student_class ( int admno ) ;
+extern void display_msg_static ( string ) ;
+extern int grab_date ( char [] , char [] ) ;
 
-extern int show_student_data_brief ( int admno ) ;
+extern int show_student_data_brief ( int admno , int *lp ) ;
 
 extern int next_admno ;
 
@@ -29,6 +35,7 @@ int student_mark_entry () ;
 student_data search_student_file ( int* admno ) ;
 
 extern void convert ( string d , char cnvt[] ) ;
+extern char sdate[20] ;
 
 struct address
 {
@@ -93,17 +100,14 @@ public:
 		{
 			convert ( d , date_admitted );
 
-			//date_admitted.assign(d) ;
 		}
 		void set_skul_name ( string d )
 		{
 			convert ( d , skul_name );
-			//skul_name.assign (d) ;
 		}		
 		void set_student_name ( string d )
 		{
 			convert ( d , student_name );
-			//student_name.assign(d) ;
 		}
 		void set_student_gender ( string d )
 		{
@@ -115,12 +119,10 @@ public:
 		void set_father_name ( string d )
 		{
 			convert ( d , father_name );
-			//father_name.assign(d) ;
 		}
 		void set_mother_name ( string d )
 		{
 			convert ( d , mother_name );
-			//mother_name.assign(d) ;
 		}
 		void set_student_relation ( string d )
 		{
@@ -142,37 +144,30 @@ public:
 		void set_guard_name ( string d )
 		{
 			convert ( d , guard_name );
-			//guard_name.assign(d) ;
 		}							
 		void set_dob ( string d )
 		{
 			convert ( d , dob );
-			//dob.assign(d) ;
 		}
 		void set_class_admitted ( string d )
 		{
 			convert ( d , class_admitted );
-			//class_admitted.assign(d) ;
 		}
 		void set_addr_hname ( string d )
 		{
 			convert ( d , addr.hname );
-			//addr.hname.assign(d) ;
 		}		
 		void set_addr_place ( string d )
 		{
 			convert ( d , addr.place );
-			//addr.place.assign(d) ;
 		}		
 		void set_addr_post ( string d )
 		{
 			convert ( d , addr.post );
-			//addr.post.assign(d) ;
 		}		
 		void set_addr_pin ( string d )
 		{
 			convert ( d , addr.pin );
-			//addr.pin = d ;
 		}			
 		void set_age ( int d )
 		{
@@ -181,32 +176,32 @@ public:
 		void set_phone ( string d )
 		{
 			convert ( d , phone );
-			//phone.assign ( d ) ;
 		}
-		void disp ()
+		void full_details_display ()
 		{
-			system("cls") ;
-			cout << endl << adm_no ;
-			cout << endl << date_admitted ;
-			cout << endl << skul_name ;
-			cout << endl << student_name ;
-			cout << endl << father_name ;
-			cout << endl << mother_name ;
-			cout << endl << guard_name ;
-			cout << endl << gender ;
-			cout << endl << relation ;
-			cout << endl << addr.hname ;
-			cout << endl << addr.place ;
-			cout << endl << addr.post ;
-			cout << endl << addr.pin ;
-			cout << endl << phone ;
-			cout << endl << dob ;
-			cout << endl << age ;
-			cout << endl << class_admitted ;
-
-			cin.get () ;
+			gotoxy ( 35 , 14 ) ;
+			if ( adm_no < 10 ) cout << "0000" ;
+			else if ( adm_no < 100 ) cout << "000" ;
+			else if ( adm_no < 10000) cout << "00" ;
+			cout << adm_no << endl ;			
+			gotoxy ( 35 , 16 ) ; cout << date_admitted << endl ;
+			gotoxy ( 35 , 18  ) ; cout << class_admitted << endl ;
+			gotoxy ( 35 , 25 ) ; cout << student_name << endl ;
+			gotoxy ( 35 , 27 ) ; cout << gender << endl ;
+			gotoxy ( 35 , 29 ) ; cout << dob << endl ;
+			gotoxy ( 35 , 31 ) ; cout << grab_date ( sdate , "year" ) - grab_date ( dob , "year" ) << endl ;			
+			gotoxy ( 35 , 33 ) ; cout << skul_name << endl ;
+			gotoxy ( 35 , 40 ) ; cout << father_name << endl ;
+			gotoxy ( 35 , 42 ) ; cout << mother_name << endl ;
+			gotoxy ( 35 , 44 ) ; cout << guard_name << endl ;
+			gotoxy ( 35 , 46 ) ; cout << relation << endl ;
+			gotoxy ( 124 , 14 ) ; cout << addr.hname << endl ;
+			gotoxy ( 124 , 16 ) ; cout << addr.place << endl ;
+			gotoxy ( 124 , 18 ) ; cout << addr.post << endl ;
+			gotoxy ( 124 , 20 ) ; cout << addr.pin << endl ;
+			gotoxy ( 124 , 22 ) ; cout << phone << endl ;
 		}	
-};
+}student_global;
 
 extern void student_central_control ( int choice )
 {
@@ -217,9 +212,9 @@ extern void student_central_control ( int choice )
 			x = new_student_entry () ;
 			break ;
 		case 2 :
-
 			break ;
 		case 3 :
+			x = search_student_entry () ;
 			break ;
 		case 4 :
 			break ;
@@ -237,6 +232,7 @@ int new_student_entry ()
 	string data = "" ;
 	data.reserve ( 50 ) ;
 
+START:
 	header();
 	gotoxy(75 , 8) ;
 	cout<<"NEW STUDENT ENTRY"<<endl;
@@ -407,7 +403,9 @@ READ_SKUL:
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 29 ) ;
-		printf ( "          " ) ;			
+		printf ( "          " ) ;	
+		gotoxy ( 35 , 31 ) ;
+		printf ( "  " ) ;						
 		goto READ_DOB ;			
 	}
 	s.set_skul_name ( data ) ;
@@ -506,25 +504,41 @@ READ_PHONE:
 	read_data ( &data , 124 , 22 , 13 , 1 ) ;
 	if ( data == "-1" )
 	{
+		gotoxy ( 124 , 20 ) ;
+		printf ( "                  " ) ;
 		goto READ_ADDR_PIN;			
 	}
 	s.set_phone ( data ) ;
 
-	FILE* fp ;
+	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
 
-	fp = fopen ( "stud_db.bin" , "ab+" ) ;
+	char decision = ' ' ;
+	char items[] = { 'Y' , 'N' } ;
+	read_char ( &decision , 0 , 0 , items , 2 ) ;
 
-	if ( fp != NULL )
+	if ( decision == 'Y' || decision == 'y' ) 
 	{
-			fwrite( &s , sizeof(student_data) , 1 , fp );
-			++next_admno ;
+		FILE* fp ;
+
+		fp = fopen ( "stud_db.bin" , "ab+" ) ;
+
+		if ( fp != NULL )
+		{
+				fwrite( &s , sizeof(student_data) , 1 , fp );
+				++next_admno ;
+		}
+
+		fclose ( fp ) ;
+
+		fee_student_init ( s.get_admno() , s.date_admitted ) ;
+
+		display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
+		hit_enter ( 0 , 0 ) ;
+
+		return 1 ;
 	}
-
-	fclose ( fp ) ;
-
-	fee_student_init ( s.get_admno() , s.date_admitted ) ;
-
-	cin.get () ;
+	else
+		goto START ;
 
 	return  0 ;
 }
@@ -536,6 +550,158 @@ int edit_student_entry()
 
 int search_student_entry()
 {
+	int i = 0 , j = 0 , lp = 0 ;
+	int adm = 0 ;
+
+	string data = "" ;
+
+START:
+	header();
+	gotoxy(74 , 8) ;
+	cout<<"SEARCH STUDENT ENTRY"<<endl;
+	gotoxy(73,9);
+	for ( i = 1 ; i <= strlen ("SEARCH STUDENT ENTRY")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+	gotoxy ( 5 , 10 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 30 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	gotoxy ( 6 , 11 ) ;
+	cout << " >> ADMISSION NUMBER :  " ;
+
+	gotoxy ( 5 , 12 ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 30 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 73 , 14 ) ; cout << "||| SEARCH RESULTS |||"<<endl ;
+
+	data = "" ;
+	adm = 0 ;
+	lp = 0 ;
+
+	while ( data != "done" )
+	{
+		read_data_continuous ( &data , 30 , 11 , 8 , 1 , &adm ) ;
+		if ( data == "-1" )
+		{
+			return 0 ;
+		}
+
+		int found =	show_student_data_brief ( adm , &lp ) ;
+
+		if ( !found )
+			data = "" ;
+
+	}
+
+	header();
+	gotoxy(74 , 8) ;
+	cout<<"SEARCH STUDENT ENTRY"<<endl;
+	gotoxy(73,9);
+	for ( i = 1 ; i <= strlen ("SEARCH STUDENT ENTRY")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+
+	gotoxy ( 5 , 12 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 6 ; ++j )
+	{	
+		gotoxy ( 5 , 13+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 40 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 13+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 11) ; cout << "** OFFICIAL INFO **" ;
+	gotoxy ( 6 , 14 ) ; cout << " >>  ADMISSION NUMBER     : " << endl ;
+	gotoxy ( 6 , 16 ) ; cout << " >>  DATE  OF ADMISSION   : " << endl ;
+	gotoxy ( 6 , 18 ) ; cout << " >>  CLASS OF ADMISSION   : " << endl ;
+
+
+
+	gotoxy ( 5 , 23 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 10 ; ++j )
+	{	
+		gotoxy ( 5 , 24+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 85 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 24+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 22) ; cout << "** PERSONAL INFO **" ;
+	gotoxy ( 6 , 25 ) ; cout << " >>  STUDENT NAME         : " << endl ;
+	gotoxy ( 6 , 27 ) ; cout << " >>  GENDER               : " << endl ;
+	gotoxy ( 6 , 29 ) ; cout << " >>  DATE OF BIRTH        : " << endl ;
+	gotoxy ( 6 , 31 ) ; cout << " >>  AGE                  : " << endl ;
+	gotoxy ( 6 , 33 ) ; cout << " >>  SCHOOL               : " << endl ;
+
+
+
+	gotoxy ( 5 , 38 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 8 ; ++j )
+	{	
+		gotoxy ( 5 , 39+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 85 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 39+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 37) ; cout << "** PARENTAL & GUARDIAN INFO **" ;
+	gotoxy ( 6 , 40 ) ; cout << " >>  FATHER'S NAME        : " << endl ;
+	gotoxy ( 6 , 42 ) ; cout << " >>  MOTHER'S NAME        : " << endl ;
+	gotoxy ( 6 , 44 ) ; cout << " >>  GUARDIAN'S NAME      : " << endl ;
+	gotoxy ( 6 , 46 ) ; cout << " >>  RELATION             : " << endl ;
+   
+
+	gotoxy ( 98, 12 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 10 ; ++j )
+	{	
+		gotoxy ( 98 , 13+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 58 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 98 , 13+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 100 , 11) ; cout << "** CONTACT INFO **" ;
+	gotoxy ( 101 , 14 ) ; cout << " >>  HOUSE NAME     : " << endl ;
+	gotoxy ( 101 , 16 ) ; cout << " >>  CITY / TOWN    : " << endl ;
+	gotoxy ( 101 , 18 ) ; cout << " >>  POST OFFICE    : " << endl ;
+	gotoxy ( 101 , 20 ) ; cout << " >>  PIN            : " << endl ;
+	gotoxy ( 101 , 22 ) ; cout << " >>  PHONE          : " << endl ;
+
+	student_global.full_details_display () ;
+
+	display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
+	hit_enter ( 0 , 0 ) ;
+
 	return  0 ;
 }
 
@@ -570,40 +736,40 @@ extern int get_next_adm_no ()
 
 student_data search_student_file ( int* admno )
 {
-	student_data x ;
+	student_data s ;
 	int y = 1 ;
+
+	if ( *admno >= next_admno ) 
+	{
+		*admno = -1 ;
+		return s ;
+	}
 
 	fstream file ;
 
-	file.open ( "stud_db.bin" , ios::in|ios::binary ) ;
+	file.open ( "stud_db.bin" , ios::in | ios::binary ) ;
 
-	while ( y < next_admno )
-	{
-		file.read((char*)&x , sizeof(student_data)) ;
-		if ( x.get_admno() == *admno )
-		{
-			file.close () ;	
-			return x ;	
-		}
-		++y ;
-	}
+	file.seekg ( (*admno-1)*sizeof(student_data) , ios::beg ) ; 
 
-	file.close () ;
+	file.read ((char*)&s , sizeof(student_data) ) ;
 
-	*admno = -1 ;
+	file.close () ;	
 	
-	return x ;
+	return s ;
 
 }
 
-extern int show_student_data_brief ( int admno ) 
+extern int show_student_data_brief ( int admno , int* lp ) 
 {
 	static int clean = 0 ;
 
 	student_data s ;
 
 	if ( admno )
+	{
 		s = search_student_file ( &admno ) ;
+		student_global = s ;
+	}
 
 	if ( clean == 1 )
 	{
@@ -643,8 +809,48 @@ extern int show_student_data_brief ( int admno )
 		cout << "** CLASS :                 " << s.class_admitted << endl ;
 		gotoxy ( 6 , 20 ) ;
 		cout << "** DATE OF ADMISSION :     " << s.date_admitted << endl ;
+
+		if ( !strcmp ( s.class_admitted , "1" ) || !strcmp ( s.class_admitted , "2" ) || !strcmp ( s.class_admitted , "3" ) || !strcmp ( s.class_admitted , "4" ))	
+			*lp = 1 ;
+		else
+			*lp = 0 ;	
 		clean = 2 ;
 		return 1 ;
 	}
 
 }
+
+extern string get_student_name ( int admno ) 
+{
+	string name = "" ;
+	student_data s ;
+	fstream file ;
+	file.open ( "stud_db.bin" , ios::in | ios::binary ) ;
+
+	file.seekg ( (admno-1)*sizeof(student_data) , ios::beg ) ; 
+
+	file.read ((char*)&s , sizeof(student_data) ) ;
+
+	file.close () ;
+
+	name = s.student_name ;
+	return name ;
+}
+
+extern string get_student_class ( int admno ) 
+{
+	string Class = "" ;
+	student_data s ;
+	fstream file ;
+	file.open ( "stud_db.bin" , ios::in | ios::binary ) ;
+
+	file.seekg ( (admno-1)*sizeof(student_data) , ios::beg ) ; 
+
+	file.read ((char*)&s , sizeof(student_data) ) ;
+
+	file.close () ;
+
+	Class = s.class_admitted ;
+	return Class ;	
+}
+

@@ -15,6 +15,7 @@ extern void read_date ( string* data , int x , int y , int max_size , int today 
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
 extern void read_vector ( string* data , int x , int y , vector<string> list , int* pos ) ;
+extern void hit_enter () ;
 
 extern char sdate[20] ;
 extern int read_ctr = 0 ;
@@ -329,8 +330,11 @@ extern void read_char ( char* d , int x , int y , char items[] , int size )
 			gotoxy ( x , y ) ;
 			data_ = _getch();
 
-			if ( (int)data_ == 13 && is_available ( items , size , *d ) )
+			*d = data_ ;
+			if ( is_available ( items , size , toupper(*d) ) )
+			{
 				break ;			
+			}
 			
 			if ( !i && (int)data_  == 13 ) 
 			{	
@@ -359,43 +363,21 @@ extern void read_char ( char* d , int x , int y , char items[] , int size )
 			if ( data_ != ' ' && (int)data_ != 13 ) 
 			{
 				gotoxy ( x , y ) ;
-				if ( *d == 'M' && size == 2 )
-					cout << "MALE  " ;
-				if ( *d == 'F' && size == 2 )
-					cout << "FEMALE" ;
 
-				if ( *d == 'M' && size == 7 )
-					cout << "MOTHER " ;
-				if ( *d == 'F' && size == 7 )
-					cout << "FATHER " ;		
-				if ( *d == 'U' && size == 7 )
-					cout << "UNCLE  " ;
-				if ( *d == 'A' && size == 7 )
-					cout << "AUNTY  " ;		
-				if ( *d == 'O' && size == 7 )
-					cout << "OTHER  " ;
-				if ( *d == 'B' && size == 7 )
-					cout << "BROTHER" ;	
-				if ( *d == 'S' && size == 7 )
-					cout << "SISTER " ;	
-				gotoxy ( x , y ) ;
 			}
 
 			
 		}
-		*d = data ;
+		//*d = data ;
 	
 }
 
 int is_available ( char items[] , int size , char d )
 {
-
 	for ( int i = 0 ; i < size ; ++i )
 	{
-	
 		if ( items[i] == d )
 		{
-		
 			return 1 ;
 		}
 	}
@@ -619,4 +601,15 @@ extern void read_data_continuous ( string* d , int x , int y , int max_size , in
 	}
 	*d = data ;
 
+}
+
+extern void hit_enter ( int x , int y ) 
+{
+	char ch = NULL ;
+	while ( ch != 13 )
+	{
+		ch = _getch () ;
+		printf(" ");
+		gotoxy ( x , y ) ;
+	}
 }

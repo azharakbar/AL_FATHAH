@@ -3,8 +3,63 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <stdio.h>
 
 using namespace std ;
+
+struct fees
+{
+	int adm_fee ;
+	int lp_fee ;			// 1 >> 4
+	int up_fee ;			// 5 >> 10
+};
+
+class general
+{
+	fees fee_struct ;
+	int total_enrolled ;
+
+	public:
+		void set_adm_fee ( int d )
+		{
+			fee_struct.adm_fee = d ;
+		}
+		int get_adm_fee ()
+		{
+			return fee_struct.adm_fee ;
+		}
+		void set_lp_fee ( int d )
+		{
+			fee_struct.lp_fee = d ;
+		}
+		int get_lp_fee ()
+		{
+			return fee_struct.lp_fee ;
+		}
+		void set_up_fee ( int d )
+		{
+			fee_struct.up_fee = d ;
+		}
+		int get_up_fee ()
+		{
+			return fee_struct.up_fee ;
+		}
+		void set_tot_enrol ( )		
+		{
+			++total_enrolled ;
+		}
+		int get_tot_enrol ()
+		{
+			return total_enrolled ;
+		}
+		general ()
+		{
+			fee_struct.adm_fee = 250 ;
+			fee_struct.lp_fee = 150 ;
+			fee_struct.up_fee = 200 ;
+			total_enrolled = 0 ;
+		}				
+} g ; 
 
 extern void gotoxy ( int x , int y ) ;
 extern void display_time ( void* params ) ;
@@ -15,12 +70,21 @@ extern void convert ( string d , char cnvt[] ) ;
 extern int  find_age ( string data ) ;
 extern int grab_date ( char [] , char [] ) ;
 extern string convert_month ( int mnth ) ;
+extern int convert_month ( string mnth = "" , char mnt[] = "" ) ;
+extern string next_month ( int , int ) ;
 extern void generate_avail_list ( char start[] , char end[] ) ;
+extern int calc_date_diff ( char start[] , char end[] ) ;
 
 extern char sdate[20] = "" ;
 extern char stime[20] = "" ;
-
+char pause[20] = "no" ;
 extern bool logged_in ;
+
+extern void startup_tasks ( void* ) ;
+extern int get_next_adm_no () ;
+extern int next_admno = 0 ;
+
+extern int general_tasks ( string , int* data = 0 ) ;
 
 extern void gotoxy (int x, int y)
 {
@@ -39,7 +103,7 @@ extern void display_time ( void* params )
 
 	while ( 1 )
 	{
-
+		while ( !strcmp ( pause , "yes" ) ) ;
 		if ( logged_in )
 		{
 			strcpy (temp_time , "" ) ;
@@ -50,14 +114,18 @@ extern void display_time ( void* params )
 			logged_in = false ;
 		}
 
+		while ( !strcmp ( pause , "yes" ) ) ;
 		system ( "time /T > time.txt" ) ;
 		system ( "date /T > date.txt" ) ;
+		while ( !strcmp ( pause , "yes" ) ) ;
 
 		fstream file ;
+		while ( !strcmp ( pause , "yes" ) ) ;
 		file.open ( "time.txt" , ios::in );
 		file.getline ( temp_time , 20 ) ;
 		file.close () ;
 
+		while ( !strcmp ( pause , "yes" ) ) ;
 		file.open ( "date.txt" , ios::in );
 		file.getline ( temp_date , 20 ) ;
 		file.close () ;
@@ -69,11 +137,13 @@ extern void display_time ( void* params )
 
 			if ( !flag )
 			{
+				while ( !strcmp ( pause , "yes" ) ) ;
 				gotoxy ( 3 , 29 ) ;  cout << sdate << endl ;
 				gotoxy ( 158 , 29 ) ; cout << stime << endl ;
 			}
 			else
 			{
+				while ( !strcmp ( pause , "yes" ) ) ;
 				gotoxy ( 3 , 7 ) ;  cout << sdate << endl ;
 				gotoxy ( 158 , 7 ) ; cout << stime << endl ;				
 			}
@@ -84,11 +154,13 @@ extern void display_time ( void* params )
 			{
 				if ( strcmp ( sdate , temp_date ) )
 				{
+					while ( !strcmp ( pause , "yes" ) ) ;
 					strcpy ( sdate , temp_date ) ;
 					gotoxy ( 3 , 29 ) ;  cout << sdate << endl ;
 				}
 				if ( strcmp ( stime , temp_time ) )
 				{
+					while ( !strcmp ( pause , "yes" ) ) ;
 					strcpy ( stime , temp_time ) ;
 					gotoxy ( 158 , 29 ) ;  cout << stime << endl ;
 				}
@@ -97,18 +169,20 @@ extern void display_time ( void* params )
 			{
 				if ( strcmp ( sdate , temp_date ) )
 				{
+					while ( !strcmp ( pause , "yes" ) ) ;
 					strcpy ( sdate , temp_date ) ;
 					gotoxy ( 3 , 7 ) ;  cout << sdate << endl ;
 				}
 				if ( strcmp ( stime , temp_time ) )
 				{
+					while ( !strcmp ( pause , "yes" ) ) ;
 					strcpy ( stime , temp_time ) ;
 					gotoxy ( 158 , 7 ) ;  cout << stime << endl ;
 				}
 			}
 		}
 
-		//Sleep ( 500 ) ;
+		Sleep ( 2500 ) ;
 	}
 	_endthread() ;
 }
@@ -208,9 +282,36 @@ extern string convert_month ( int id )
 		return "DECEMBER" ;	
 }
 
+extern int convert_month ( string mnth , char mnt[] ) 
+{
+	if ( mnth == "JANUARY" || !strcmp ( mnt , "JANUARY" ) )
+		return 1 ;
+	else if ( mnth == "FEBRUARY" || !strcmp ( mnt , "FEBRUARY" ) )
+		return 2 ;	
+	else if ( mnth == "MARCH" || !strcmp ( mnt , "MARCH" ) )
+		return 3 ;	
+	else if ( mnth == "APRIL" || !strcmp ( mnt , "APRIL" ) )
+		return 4 ;	
+	else if ( mnth == "MAY" || !strcmp ( mnt , "MAY" ) )
+		return 5 ;	
+	else if ( mnth == "JUNE" || !strcmp ( mnt , "JUNE" ) )
+		return 6 ;	
+	else if ( mnth == "JULY" || !strcmp ( mnt , "JULY" ) )
+		return 7 ;	
+	else if ( mnth == "AUGUST" || !strcmp ( mnt , "AUGUST" ) )
+		return 8 ;	
+	else if ( mnth == "SEPTEMBER" || !strcmp ( mnt , "SEPTEMBER" ) )
+		return 9 ;	
+	else if ( mnth == "OCTOBER" || !strcmp ( mnt , "OCTOBER" ) )
+		return 10 ; 								
+	else if ( mnth == "NOVEMBER" || !strcmp ( mnt , "NOVEMBER" ) )
+		return 11;
+	else if ( mnth == "DECEMBER" || !strcmp ( mnt , "DECEMBER" ) )
+		return 12 ;		
+}
+
 extern void generate_avail_list ( char start[] , char end[] , vector<string>& list ) 
 {
-	 ;
 	list.clear () ;
 
 
@@ -284,11 +385,140 @@ extern void generate_avail_list ( char start[] , char end[] , vector<string>& li
 }
 
 
+extern void startup_tasks ( void* params ) 
+{
+	FILE* fp ;
+
+	fp = fopen ( "stud_db.bin" , "r" ) ;
+
+	if ( fp == NULL )
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "stud_db.bin" , "w" ) ;
+	}
+
+	fclose ( fp ) ;
+
+	next_admno = get_next_adm_no () ;
+
+	fp = fopen ( "fee_db.bin" , "r" ) ;
+
+	if ( fp == NULL )
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "fee_db.bin" , "w" ) ;
+	}
+
+	fclose ( fp ) ;	
+
+	fp = fopen ( "gen_db.bin" , "r" ) ;
+
+	if ( fp == NULL )
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "gen_db.bin" , "wb+" ) ;
+		fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
+	}
+	else
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "gen_db.bin" , "rb+" ) ;	
+		fread ( &g , sizeof ( general ) , 1 , fp ) ;
+		fclose ( fp ) ;		
+	}		
+
+
+}
+
+extern int general_tasks ( string type , int* data ) 
+{
+	if ( type == "get_enroll")
+	{
+		*data = g.get_tot_enrol () ;
+	}
+	else if ( type == "get_adm_fee" )
+	{
+		*data += g.get_adm_fee () ;
+	}		
+	else if ( type == "get_lp_fee" )
+	{
+		*data += g.get_lp_fee () ;
+	}	
+	else if ( type == "get_up_fee" )
+	{
+		*data += g.get_up_fee () ;
+	}	
+	else if ( type == "set_enroll")
+	{
+		g.set_tot_enrol () ;
+	}
+	else if ( type == "set_adm_fee" )
+	{
+		g.set_adm_fee ( *data ) ;
+	}
+	else if ( type == "set_lp_fee" )
+	{
+		g.set_lp_fee ( *data ) ;
+	}
+	else if ( type == "set_up_fee" )
+	{
+		g.set_up_fee ( *data ) ;
+	}
+	if ( type[0] == 's' )
+	{
+		FILE *fp ;
+
+		fp = fopen ( "gen_db.bin" , "wb+" ) ;
+
+		fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
+		fclose ( fp ) ;						
+	}	
+}
+
+extern string next_month ( int month , int year ) 
+{
+	string str = "" ;
+	char next[5] = "" ;
+
+	if ( month == 12 )
+	{
+		str = "JANUARY " ;
+		int nyr = year + 1 ;
+		itoa ( nyr , next , 10 ) ;
+		str = str + next ;
+	}
+
+	else
+	{
+		str = convert_month ( month + 1 ) ;
+		str += " " ;
+		itoa ( year , next , 10 ) ;
+		str += next ;
+	}
+
+	return str ;
+}
+
+extern int calc_date_diff ( char start[] , char end[] ) 
+{
+	if ( grab_date ( start , "year") == grab_date ( end , "year" ) )
+	{
+		return grab_date ( end , "month") - grab_date ( start , "month" ) + 1;
+	}
+	else
+	{
+
+	}
+	return 0 ;
+}
+
 extern void header ()
 {
+	strcpy ( pause , "yes" ) ;
 	system ( "cls" ) ;
+	gotoxy ( 3 , 7 ) ;  cout << sdate << endl ;
+	gotoxy ( 158 , 7 ) ; cout << stime << endl ;
 	logged_in = true ;
-	Sleep (100) ;
 	gotoxy ( 59 , 1 );
 	cout << " ____ ____ _________ ____ ____ ____ ____ ____ ____ "<<endl ;
 	gotoxy ( 59 , 2 );
@@ -303,10 +533,12 @@ extern void header ()
 		cout << (char)220 ;
 
 	draw_msg_box_static() ;
+	strcpy ( pause , "" ) ;
 }
 
 extern void exit_screen()
 {
+	strcpy ( pause , "yes" ) ;
 	int i=0;
 	system("cls");
 	for(i=0;i<=18;++i)

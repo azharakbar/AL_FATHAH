@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <vector>
+#include <windows.h>
+#include <iomanip>
 
 using namespace std ;
 
@@ -12,19 +14,30 @@ extern void fee_central_control ( int choice ) ;
 extern void fee_student_init ( int admno , char date []  ) ;
 
 extern void header () ;
+extern int general_tasks ( string type , int* data = 0 ) ; 
 extern void gotoxy ( int , int ) ;
 extern void read_data ( string* data , int x , int y , int max_size , int number , int* n = NULL ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_vector ( string* data , int x , int y , vector<string> list , int* pos ) ;
+extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
+extern void convert ( string d , char cnvt[] ) ;
+extern string next_month ( int , int ) ;
+extern int convert_month ( string mnth = "" , char mnt[] = "" ) ;
+extern int calc_date_diff ( char start[] , char end[] ) ;
+extern string get_student_name ( int admno ) ;
+extern string get_student_class ( int admno ) ;
+extern void display_msg_static ( string ) ;
 
-extern int  show_student_data_brief ( int admno ) ;
-extern fee_details show_fee_data_brief ( int admno ) ;
+extern int  show_student_data_brief ( int admno , int* lp ) ;
+extern fee_details show_fee_data_brief ( int admno , int* status ) ;
 
 extern int grab_date ( char [] , char [] ) ;
 extern string convert_month ( int id ) ;
 extern void generate_avail_list ( char start[] , char end[] , vector<string>& list ) ;
 
-int fee_pay () ;
+int  fee_pay () ;
+int  view_fee_defaulters () ;
+void view_fee_stats () ;
 
 extern int read_ctr ;
 extern int next_admno ;
@@ -38,6 +51,7 @@ public:
 	int months_payed ;
 	char date_admitted[15] ;
 	char last_payd[20] ;
+	char to_pay[20] ;
 
 	fee_details ()
 	{
@@ -46,6 +60,7 @@ public:
 		months_payed = 0 ;
 		strcpy ( date_admitted , "NOT INIT" ) ;
 		strcpy ( last_payd , "0" ) ;
+		strcpy ( to_pay , "0" ) ;
 	}
 
 	void set_admno ( int d )
@@ -60,26 +75,129 @@ public:
 	{
 		strcpy ( date_admitted , date ) ;
 	}
-};
+	void set_to_pay ( char lst_pyd[] )
+	{
+		int i = 0 ;
+		string month ;
+		int yr = 0 ;
+		char temp[6] = "" , t[6] = "" ;
+
+		for ( i = 0 ; lst_pyd[i] != '\0' ; ++i )
+		{
+			if ( lst_pyd[i] != ' ' )
+			{
+				if ( isalpha ( lst_pyd[i] ))
+					month = month + lst_pyd[i] ;
+				else
+				{
+					yr *= 10 ;
+					yr = ( yr + lst_pyd[i] - 48 ) ; 
+				}
+			}
+		}
+
+		if ( month == "DECEMBER" )
+		{
+			month = "01/01/";
+			++yr ;
+			itoa ( yr , temp , 10 ) ;
+			month = month + temp ;	
+		}
+		else 
+		{
+			int x  = convert_month ( month ) ;
+			++x ;
+			month = "01/";
+			if ( x == 10 || x == 11 || x == 12 )
+			{
+				itoa ( x , temp , 10 ) ;
+			}
+			else
+			{
+				itoa ( x ,t ,10 ) ;
+				strcpy ( temp , "0" ) ;
+				strcat ( temp , t ) ;				
+			}
+			month = month + temp ;
+			month = month + "/" ;			
+			itoa ( yr , temp , 10 ) ;
+			month = month + temp ;				
+		}
+
+		convert ( month , to_pay ) ;
+	}
+
+	void show_fee_defaulter ( int entry ) 
+	{
+		gotoxy ( 12 , 18+entry ) ;
+		cout << setw(5) << admno << endl ;
+
+		gotoxy ( 25 , 18+entry ) ;
+		cout << get_student_name ( admno ) << endl ;
+
+		gotoxy ( 80 , 18+entry ) ;
+		cout << get_student_class ( admno ) << endl ;
+
+		gotoxy ( 100 , 18+entry ) ;
+		if ( strcmp ( last_payd , "0" ) )
+			cout << last_payd << endl ;
+		else
+			cout << "ADM FEES NT PD" << endl ;
+
+		gotoxy ( 125 , 18+entry ) ;
+		if ( strcmp ( last_payd , "0" ) )
+			cout << setw(8) << calc_date_diff ( to_pay , sdate ) << endl ;			
+		else
+			cout << setw(8) << calc_date_diff ( date_admitted , sdate ) << endl ;
+	}
+}fee_global;
 
 
 extern void fee_central_control ( int choice )
 {
-	int x = 0 ;
+	int x = 0 , admno = 0 , y = 0 ;
 	switch ( choice )
 	{
 		case 1 :
-			x = fee_pay () ;
-			break ;
-		case 2 :
+			admno = fee_pay () ;
+
+			if ( admno > 0 )
+			{
+				fee_details x ;
+				y = 1 ;
+
+				fstream oldfile ;
+				fstream newfile ;
+				oldfile.open ( "fee_db.bin" , ios::in | ios::binary ) ;
+				newfile.open ( "temp.bin" , ios::out | ios::binary ) ;
+
+				while ( y < next_admno )
+				{
+					oldfile.read (( char* ) &x , sizeof(fee_details) ) ;
+					if ( x.admno == fee_global.admno )
+					{
+						x = fee_global ;
+					}
+					newfile.write (( char* ) &x , sizeof ( fee_details ) ) ;
+					++y ;
+				}
+				oldfile.close() ;
+				newfile.close() ;
+
+				remove ( "fee_db.bin" );
+				system ( "rename temp.bin fee_db.bin" );
+
+			}
 
 			break ;
+		case 2 :
+			x = view_fee_defaulters () ;
+			break ;
 		case 3 :
+			view_fee_stats () ;
 			break ;
 		case 4 :
-			break ;
-		case 5 :
-			break ;
+			return ;
 
 	}
 }
@@ -128,13 +246,15 @@ extern void fee_student_init ( int admno , char date [] )
 
 int fee_pay () 
 {
-	int i = 0 , j = 0 ;
+	int i = 0 , j = 0 , lp = 0 ;
 	int adm = 0 ;
+	int total = 0 , status = 0 ;
 
 	string data = "" ;
 
 	fee_details f ;
 
+START_FEE_PAY:
 	header();
 	gotoxy(78 , 8) ;
 	cout<<"FEE PAYMENT"<<endl;
@@ -158,6 +278,12 @@ int fee_pay ()
 
 	gotoxy ( 73 , 14 ) ; cout << "||| SEARCH RESULTS |||"<<endl ;
 
+	data = "" ;
+	adm = 0 ;
+	lp = 0 ;
+	total = 0 ;
+	status = 0 ;
+
 	while ( data != "done" )
 	{
 		read_data_continuous ( &data , 30 , 11 , 8 , 1 , &adm ) ;
@@ -166,14 +292,21 @@ int fee_pay ()
 			return 0 ;
 		}
 
-		int found =	show_student_data_brief ( adm ) ;
+		int found =	show_student_data_brief ( adm , &lp ) ;
 
 		if ( found )
-			f = show_fee_data_brief ( adm ) ;
+			f = show_fee_data_brief ( adm , &status ) ;
 		if ( !found )
 			data = "" ;
+
+		if ( data == "done" && status == 0 )
+		{
+			data = "" ;
+		}
+
 	}
 
+	fee_global = f ;
 
 	gotoxy ( 64 , 25 ) ;
 	cout << (char)201 ;
@@ -197,25 +330,73 @@ int fee_pay ()
 
 	gotoxy ( 88 , 27 ) ; 
 	if ( strcmp ( f.last_payd , "0" ))
-		cout << f.last_payd ;
+		cout << convert_month ( grab_date ( f.to_pay , "month" ) ) << " " << grab_date ( f.to_pay , "year" ) <<endl ;	
 	else
 		cout << convert_month ( grab_date ( f.date_admitted , "month" ) ) << " " << grab_date ( f.date_admitted , "year" ) <<endl ;	
 
 	std::vector<string> list;
-	generate_avail_list ( f.date_admitted , sdate , list ) ;
+
+	if ( strcmp ( f.last_payd , "0" ))
+		generate_avail_list ( f.to_pay , sdate , list ) ;
+	else
+		generate_avail_list ( f.date_admitted , sdate , list ) ;		
 
 	data = "" ;
 	int no = 0 ;
 	read_vector ( &data , 88 , 29 , list , &no ) ;
 
+	if ( data == "-1" )
+		goto START_FEE_PAY ;
+
 	gotoxy ( 88 , 31 ) ;
 	cout << no+1 << endl ;
 
-	cin.get () ;
+	gotoxy ( 88 , 33 ) ;
+	if ( strcmp ( f.last_payd , "0" ) )
+	{
+		if (lp)
+			general_tasks ( "get_lp_fee" ,  &total) ;
+		else
+			general_tasks ( "get_up_fee" , &total ) ;
+
+		total = total * ( no+ 1 ) ;
+	}
+	else
+	{
+		if (lp)
+			general_tasks ( "get_lp_fee" , &total) ;
+		else
+			general_tasks ( "get_up_fee" , &total) ;
+
+		total = total * ( no+ 1 ) ;
+
+		general_tasks ( "get_adm_fee" , &total ) ;
+
+	}
+
+	cout << total ;
+
+	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
+	char decision = ' ' ;
+	char items[] = { 'Y' , 'N' } ;
+	read_char ( &decision , 0 , 0 , items , 2 ) ;
+
+	if ( decision == 'Y' || decision == 'y' ) 
+	{
+		fee_global.fee_init = 1 ;
+		fee_global.months_payed += (no+1) ;
+		char d[20] = "" ;
+		convert ( data , d ) ;
+		strcpy  ( fee_global.last_payd , d ) ;
+		fee_global.set_to_pay ( fee_global.last_payd ) ;
+		return adm ;
+	}
+	else goto START_FEE_PAY ;
+
 	return 0 ;
 }
 
-extern fee_details show_fee_data_brief ( int admno ) 
+extern fee_details show_fee_data_brief ( int admno , int *status ) 
 {
 	static int clean = 0 ;
 
@@ -225,9 +406,139 @@ extern fee_details show_fee_data_brief ( int admno )
 
 	gotoxy ( 90 , 18 ) ;
 	if ( strcmp ( f.last_payd , "0" ) )
+	{
 		cout << "** FEE LAST PAID ON :     " << f.last_payd << endl ;
+		
+		string str = convert_month ( grab_date ( sdate , "month" ) ) ;
+		str = str + " " ;
+		char temp[20] = "" ;
+		itoa ( grab_date ( sdate , "year" ) , temp , 10 ) ;
+		str = str + temp ;
+
+		convert ( str , temp ) ;
+
+		if ( !strcmp ( temp , f.last_payd ))
+			*status = 0 ;
+		else
+			*status = 1 ;
+
+	}
 	else
+	{
 		cout << "** FEE LAST PAID ON :     " << "ADMISSION FEES NOT PAID" << endl ;
+		*status = 1 ;
+	}
 
 	return f ;
+}
+
+int view_fee_defaulters () 
+{
+	fee_details x ;
+	int y = 1 , i = 0 ;
+	int no = 0 ;
+
+	fstream file ;
+
+	header();
+	gotoxy(76 , 8) ;
+	cout<<"FEE DEFAULTERS"<<endl;
+	gotoxy(75,9);
+	for ( i = 1 ; i <= strlen ("FEE DEFAULTERS")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+	gotoxy ( 9 , 12 ) ;
+	for ( i = 1 ; i <= 149 ; ++i )
+		cout << (char)196 ;
+	cout << endl ;
+
+	gotoxy ( 9 , 16 ) ;
+	for ( i = 1 ; i <= 149 ; ++i )
+		cout << (char)196 ;
+	cout << endl ;	
+
+	gotoxy ( 12 , 14 ) ;
+	cout << "ADM NO." << endl ;
+
+	gotoxy ( 25 , 14 ) ;
+	cout << "NAME" << endl ;
+
+	gotoxy ( 80 , 14 ) ;
+	cout << "CLASS" << endl ;	
+
+	gotoxy ( 100 , 14 ) ;
+	cout << "FEE LAST PAYED" << endl ;
+
+	gotoxy ( 125 ,14 ) ;
+	cout << "FEE PENDING MONTHS" << endl ;
+
+	file.open ( "fee_db.bin" , ios::in|ios::binary ) ;
+
+	while ( y < next_admno )
+	{
+		file.read((char*)&x , sizeof(fee_details)) ;
+
+		if ( (grab_date ( x.to_pay , "year" ) < grab_date ( sdate , "year" )) || ( grab_date ( x.to_pay , "year" ) == grab_date ( sdate , "year" ) ) && ( grab_date ( x.to_pay , "month" ) <= grab_date ( sdate , "month" )  )  )
+		{
+			x.show_fee_defaulter ( no*2 ) ;	
+			++no;
+		}
+
+
+		++y ;
+	}
+	if ( no )
+	{
+		char temp[5] = "" ;
+		itoa ( no , temp , 10 ) ;
+		string msg = "<< ** >> FEE DEFAULTERS :: " ;
+		msg += temp ;
+		msg += " << ** >>" ;
+		display_msg_static ( msg ) ;
+	}
+	else
+	{
+		display_msg_static ( "***** NO FEE DEFAULTERS *****") ;
+	}
+			cin.get () ;
+
+
+	file.close () ;
+
+	return 0 ;
+}
+
+void view_fee_stats () 
+{
+	int i = 0 , j = 0 ;
+
+	header();
+	gotoxy( 74 , 13 ) ;
+	cout<<"FEE COLLECTION STATS"<<endl;
+	gotoxy( 73,  14 );
+	for ( i = 1 ; i <= strlen ("FEE COLLECTION STATS")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+	gotoxy(58,16);
+	for(i=0;i<51;++i)cout<<(char)220;
+	cout<<endl;
+	
+	gotoxy(58,17); cout<<(char)219<<"                                                 "<<(char)219<<endl;
+	gotoxy(58,18); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,19); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,20); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,21); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,22); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,24); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	gotoxy(58,25); cout<<(char)219<<"                                                 "<<(char)219<<endl;
+	gotoxy(58,26);
+	for(i=0;i<51;++i)
+		cout<<(char)223;
+	cout<<endl;	
+
+
+	cin.get () ;
 }

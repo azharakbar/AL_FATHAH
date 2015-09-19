@@ -17,18 +17,19 @@ public:
 void login_box_top (void *param ) ;
 void login_box_bottom ( void *param ) ;
 void gotoxy ( int ,int ) ;
-void retrieve_login_details ( void* param ) ;
+extern void retrieve_login_details ( void* param ) ;
+extern void write_login_details ( char user[] , char pwd[] ) ;
 void decode ( char[] , char[] ) ;
 void encode ( char[] ) ;
 extern void blink_text ( void* ) ;
 extern void display_msg ( void* ) ;
 extern void authenticate ( void* ) ;
-extern void startup_tasks ( void* ) ;
+extern void  authenticate ( char login_details[] ) ;
+
 
 extern bool threadFinishPoint ;
 
-extern int get_next_adm_no () ;
-extern int next_admno = 0 ;
+
 
 extern void login_module ( void* params )
 {
@@ -63,19 +64,7 @@ void retrieve_login_details ( void* param )
 		strcpy ( user , "admin" ) ;
 		strcpy ( pwd , "map54321" ) ;
 
-		encode ( user ) ;
-		encode ( pwd ) ;
-
-		strcpy ( login.username , user ) ;
-		strcpy ( login.password , pwd ) ;
-
-		fp = fopen ( "log_crd.bin" , "wb+" ) ;
-
-		fwrite( &login , sizeof(login_credentials) , 1 , fp );
-		fclose ( fp ) ;
-
-		strcpy ( login.username , "admin" ) ;
-		strcpy ( login.password , "map54321" ) ;
+		write_login_details ( user , pwd ) ;
 	}
 
 	else
@@ -86,7 +75,6 @@ void retrieve_login_details ( void* param )
 
 		fclose ( fp ) ;
 	}
-
 	login_main = login ;
 
 	_endthread () ;
@@ -363,32 +351,25 @@ extern void  authenticate ( void* text )
 
 }
 
-extern void startup_tasks ( void* params ) 
+extern void  authenticate ( char login_details[] ) 
 {
-	FILE* fp ;
+	char usr[50] = "" , pwd[50] = "" ;
 
-	fp = fopen ( "stud_db.bin" , "r" ) ;
+	int j = 0 , i = 0 ;
 
-	if ( fp == NULL )
-	{
-		fclose ( fp ) ;
-		fp = fopen ( "stud_db.bin" , "w" ) ;
-	}
+	for ( i = 0 ; login_details[i] != ' ' ; ++i )
+		usr[j++] = login_details[i] ;
+	usr[j] ='\0' ;
 
-	fclose ( fp ) ;
+	j = 0 ;
 
-	next_admno = get_next_adm_no () ;
+	for ( ++i ; login_details[i] != '\0' ; ++i )
+		pwd[j++] = login_details[i] ;
 
-	fp = fopen ( "fee_db.bin" , "r" ) ;
+	pwd[j] = '\0' ;
 
-	if ( fp == NULL )
-	{
-		fclose ( fp ) ;
-		fp = fopen ( "fee_db.bin" , "w" ) ;
-	}
-
-	fclose ( fp ) ;	
-
+	if ( !strcmp ( usr , login_main.username ) && !strcmp ( pwd , login_main.password )) strcpy ( login_details , "success" ) ;
+	else strcpy ( login_details , "not success" ) ;
 }
 
 extern void blink_text ( void* text )
@@ -404,4 +385,24 @@ extern void blink_text ( void* text )
 		cout << "           " ;
 		Sleep ( 500 ) ;	
 	}
+}
+
+extern void write_login_details ( char user[] , char pwd[] )
+{
+	FILE* fp ;
+	login_credentials login ;
+
+	encode ( user ) ;
+	encode ( pwd ) ;
+
+	strcpy ( login.username , user ) ;
+	strcpy ( login.password , pwd ) ;
+
+	fp = fopen ( "log_crd.bin" , "wb+" ) ;
+
+	fwrite( &login , sizeof(login_credentials) , 1 , fp );
+	fclose ( fp ) ;
+
+	decode ( login.username , login.password ) ;
+
 }

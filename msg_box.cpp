@@ -15,6 +15,7 @@ extern void draw_banner_line ( void* params );
 extern void draw_msg_box_static () ;
 
 extern void display_msg ( void* ) ;
+extern void display_msg_static ( string ) ;
 
 extern bool threadFinishPoint ;
 
@@ -212,6 +213,7 @@ extern void draw_msg_box_static ()
 		cout<<(char)223;
 	cout<<endl ;
 
+	gotoxy ( 0 , 0 ) ;
 }
 
 
@@ -316,4 +318,11 @@ void welcome_logo ()
 	cout<<" `--'  `\"                   |_|    `--'  `\"   `'-'  '---'   '---'`--'  `\" '---'   '---' "<<endl;Sleep(150);
 
 	cout<<endl;Sleep(150);	
+}
+
+extern void display_msg_static ( string msg ) 
+{
+	int start = ( 84 - (msg.length()/2) ) ;
+	gotoxy ( start , 52 ) ;
+	cout << msg << endl ;
 }

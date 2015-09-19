@@ -5,11 +5,11 @@
 
 using namespace std ;
 
-extern int menu_control ( int , int , int ) ;
+extern int menu_control ( int , int , int , int esc = 0 ) ;
 extern void gotoxy ( int , int ) ;
 //extern void student_central_control ( int );
 
-extern int menu_control ( int  x , int start_y , int end_y )
+extern int menu_control ( int  x , int start_y , int end_y , int esc )
 {
 
 	string str = "" ;
@@ -33,6 +33,11 @@ extern int menu_control ( int  x , int start_y , int end_y )
 
 			if ( b ) b = 0 ;
 			if ( ch == -32 || ch == 0 ) b = 1 ;
+			if ( esc && ch == 27 ) 
+			{
+				a = "27" ;
+				break ;
+			}
 
 			str += itoa(ch,s,10) ;
 
@@ -43,7 +48,12 @@ extern int menu_control ( int  x , int start_y , int end_y )
 			if ( ch != -32 && ch != 0 ) str = "" ;
 
 		}
-		//gotoxy ( 0 , 0 )
+
+		if ( esc && a == "27" )
+		{
+			return -1 ;
+		}	
+
 		if ( a == "-3272" )							// UP KEY
 		{
 			gotoxy ( x , start_y + pos ) ;
