@@ -26,6 +26,7 @@ extern int convert_month ( string mnth = "" , char mnt[] = "" ) ;
 extern int calc_date_diff ( char start[] , char end[] ) ;
 extern string get_student_name ( int admno ) ;
 extern string get_student_class ( int admno ) ;
+extern string get_last_payed ( int admno ) ;
 extern void display_msg_static ( string ) ;
 
 extern int  show_student_data_brief ( int admno , int* lp ) ;
@@ -541,4 +542,12 @@ void view_fee_stats ()
 
 
 	cin.get () ;
+}
+
+extern string get_last_payed ( int admno ) 
+{
+	fee_details f = search_fee_file ( admno ) ;
+	string last = f.last_payd ;
+	if ( !strcmp ( f.last_payd , "0" ) ) last = "ADM FEES NT PAID" ;
+	return last ;
 }

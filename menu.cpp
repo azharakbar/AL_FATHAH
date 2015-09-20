@@ -75,7 +75,7 @@ extern int student_menu ()
 	gotoxy(58,21); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	gotoxy(58,22); cout<<(char)186<<"     3.  SEARCH STUDENT ENTRY                    "<<(char)186<<endl;
 	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,24); cout<<(char)186<<"     4.  STUDENT MARK ENTRY                      "<<(char)186<<endl;
+	gotoxy(58,24); cout<<(char)186<<"     4.  ALL STUDENT LIST                        "<<(char)186<<endl;
 	gotoxy(58,25); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	gotoxy(58,26); cout<<(char)186<<"     5.  MAIN MENU                               "<<(char)186<<endl;
 	gotoxy(58,27); cout<<(char)219<<"                                                 "<<(char)219<<endl;

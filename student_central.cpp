@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <windows.h>
+#include <iomanip>
 
 using namespace std ;
 
@@ -23,6 +24,9 @@ extern string get_student_name ( int admno ) ;
 extern string get_student_class ( int admno ) ;
 extern void display_msg_static ( string ) ;
 extern int grab_date ( char [] , char [] ) ;
+extern string get_last_payed ( int admno ) ;
+extern int menu_control ( int  x , int start_y , int end_y , int esc ) ;
+extern void lexi_sort ( char words[][50] , int n ) ;
 
 extern int show_student_data_brief ( int admno , int *lp ) ;
 
@@ -31,7 +35,9 @@ extern int next_admno ;
 int new_student_entry () ;
 int edit_student_entry () ;
 int search_student_entry () ;
-int student_mark_entry () ;
+int all_student_list () ;
+void create_sorted_file ( char[] ) ;
+
 student_data search_student_file ( int* admno ) ;
 
 extern void convert ( string d , char cnvt[] ) ;
@@ -200,6 +206,14 @@ public:
 			gotoxy ( 124 , 18 ) ; cout << addr.post << endl ;
 			gotoxy ( 124 , 20 ) ; cout << addr.pin << endl ;
 			gotoxy ( 124 , 22 ) ; cout << phone << endl ;
+		}
+		void list_details_display ( int y )
+		{
+			gotoxy ( 12 , 18+y ) ;		cout << setw(5) << adm_no << endl ;
+			gotoxy ( 25 , 18+y ) ;		cout << student_name << endl ;
+			gotoxy ( 70 , 18+y ) ;		cout << setw (3) << class_admitted << endl ;
+			gotoxy ( 100 , 18+y ) ;		cout << setw (13) << date_admitted << endl ;
+			gotoxy ( 125 , 18+y ) ;		cout << get_last_payed ( adm_no ) << endl ;
 		}	
 }student_global;
 
@@ -217,6 +231,7 @@ extern void student_central_control ( int choice )
 			x = search_student_entry () ;
 			break ;
 		case 4 :
+			x = all_student_list () ;
 			break ;
 		case 5 :
 			break ;
@@ -705,8 +720,96 @@ START:
 	return  0 ;
 }
 
-int student_mark_entry()
+int all_student_list () 
 {
+	int i = 0 , j = 0 , y = 1 ;
+	student_data s ;
+	fstream file ;
+
+	header();
+	gotoxy(76 , 8) ;
+	cout<<"ALL STUDENT LIST"<<endl;
+	gotoxy(75,9);
+	for ( i = 1 ; i <= strlen ("ALL STUDENT LIST")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+	gotoxy ( 12 , 14 ) ; cout << "-- SORTING METHOD -- " << endl ;
+	gotoxy ( 14 , 15 ) ;	for ( i = 1 ; i <= 16 ; ++i ) cout << (char)196 ; cout << endl ;
+	gotoxy ( 12 , 17 ) ; cout << "    ADMISSION NUMBER" << endl ;
+	gotoxy ( 12 , 19 ) ; cout << "    NAME" << endl ;
+	gotoxy ( 12 , 21 ) ; cout << "    CLASS" << endl ;
+	
+	int pos = menu_control ( 11 , 17 , 21 , 1 ) ;
+
+	if ( pos == -1 ) return 0 ;
+
+	pos = ( pos+2 ) / 2 ;
+
+	if ( pos == 1 ) file.open ( "stud_db.bin" , ios :: in | ios :: binary ) ;
+
+	if ( pos == 2 ) create_sorted_file ( "name" ) ;
+
+	if ( pos == 3 ) create_sorted_file ( "class" ) ;
+
+	if ( pos == 2 || pos == 3 )
+		file.open ( "temp.bin" , ios :: in | ios :: binary ) ;
+START:
+	header();
+	gotoxy(76 , 8) ;
+	cout<<"ALL STUDENT LIST"<<endl;
+	gotoxy(75,9);
+	for ( i = 1 ; i <= strlen ("ALL STUDENT LIST")+2 ; ++i )
+		cout<<char(205);		//11
+	cout << endl ;
+
+	gotoxy ( 9 , 12 ) ;
+	for ( i = 1 ; i <= 149 ; ++i )
+		cout << (char)196 ;
+	cout << endl ;
+
+	gotoxy ( 9 , 16 ) ;
+	for ( i = 1 ; i <= 149 ; ++i )
+		cout << (char)196 ;
+	cout << endl ;	
+
+	gotoxy ( 128 , 10 ) ;
+	cout << ">> TOTAL STUDENTS :: " << next_admno-1 << " ::" << endl ;
+
+	gotoxy ( 12 , 14 ) ;
+	cout << "ADM NO." << endl ;
+
+	gotoxy ( 25 , 14 ) ;
+	cout << "NAME" << endl ;
+
+	gotoxy ( 70 , 14 ) ;
+	cout << "CLASS" << endl ;	
+
+	gotoxy ( 100 , 14 ) ;
+	cout << "DATE OF ADMISSION" << endl ;
+
+	gotoxy ( 125 ,14 ) ;
+	cout << "FEE LAST PAYED" << endl ;
+
+
+	while ( y < next_admno )
+	{	
+		file.read ( ( char* )&s , sizeof (student_data) ) ;
+		s.list_details_display ( (y-1)*2 ) ;
+		++y ;
+		if ( y % 16 == 0  && y < next_admno ) 
+		{
+			display_msg_static ( "!!! HIT >> ENTER << TO VIEW MORE !!!") ;
+			hit_enter ( 0 , 0 ) ;			
+			goto START ;
+		}
+	}
+	file.close () ;
+
+	remove ( "temp.bin" ) ;
+
+	display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
+	hit_enter ( 0 , 0 ) ;			
 	return  0 ;
 }
 
@@ -854,3 +957,79 @@ extern string get_student_class ( int admno )
 	return Class ;	
 }
 
+void create_sorted_file ( char type[] )
+{
+	int z = 1 , i = 0 , size = 0 ;
+	fstream newfile , oldfile ;
+	newfile.open ( "temp.bin" , ios::out | ios::binary ) ;
+	oldfile.open ( "stud_db.bin" , ios::in | ios::binary ) ;
+
+	student_data x , y ;
+
+	char list[][5] = { "1" , "2" ,"3" ,"4" ,"5" ,"6" ,"7" ,"8" ,"9" ,"10" ,"11" ,"12" } ;
+
+	if ( !strcmp ( type , "name") )
+	{
+		char names[next_admno][50] ;
+
+		z = 1 ;
+		i = 0 ;
+
+		while ( z < next_admno )
+		{
+			oldfile.read ((char*)&x , sizeof ( student_data )) ;
+			strcpy ( names[i++] , x.student_name ) ;
+			++z ;
+		}		
+
+		size = i ;
+
+		lexi_sort ( names , size ) ; 
+
+		i = 0 ;
+
+		while ( i < size )
+		{
+			oldfile.seekg( 0 , ios::beg ) ;
+			z = 1 ;
+			while ( z < next_admno )
+			{
+				oldfile.read ((char*)&x , sizeof ( student_data )) ;
+				if ( !strcmp ( x.student_name , names[i] ))
+				{
+					newfile.write ((char*)&x , sizeof ( student_data )) ;
+					break ;
+				}
+				++z ;
+			}
+			++i ;
+
+		}
+
+		newfile.close () ;
+		oldfile.close () ;
+	}
+
+	else if ( !strcmp ( type , "class") )
+	{
+		int i = 0 ;
+		while ( i < 12 )
+		{
+			oldfile.seekg( 0 , ios::beg ) ;
+			z = 1 ;
+			while ( z < next_admno )
+			{
+				oldfile.read ((char*)&x , sizeof ( student_data )) ;
+
+				if ( !strcmp ( x.class_admitted , list[i]))
+					newfile.write ((char*)&x , sizeof ( student_data )) ;
+
+				++z ;
+			}
+
+			++i ;
+		}
+		newfile.close () ;
+		oldfile.close () ;
+	}
+}

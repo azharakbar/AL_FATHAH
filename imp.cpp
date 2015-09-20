@@ -74,6 +74,7 @@ extern int convert_month ( string mnth = "" , char mnt[] = "" ) ;
 extern string next_month ( int , int ) ;
 extern void generate_avail_list ( char start[] , char end[] ) ;
 extern int calc_date_diff ( char start[] , char end[] ) ;
+extern void lexi_sort ( char words[][50] , int n  ) ;
 
 extern char sdate[20] = "" ;
 extern char stime[20] = "" ;
@@ -565,4 +566,37 @@ extern void exit_screen()
 	getchar();
 	system("cls");
 	exit(0);
+}
+
+extern void lexi_sort ( char words[][50] , int n ) 
+{
+	int  i = 0 , j = 0 , pos = 0 ;
+	char temp [50] = "" , first [50] = "" ;
+
+	for ( i=0 ; i<n ; ++i )
+	{
+		pos = -1 ;
+		
+		strcpy ( first , words[i] ) ;
+		
+		for ( j=i ; j<n ; ++j)
+		{
+
+			if ( strcmp ( first , words[j] ) > 0  )
+			{
+				strcpy ( first , words[j] ) ;
+				pos = j ;
+			}
+
+		}
+
+		if ( pos != -1 )
+		{
+			strcpy ( temp , words[i] ) ; 
+			strcpy ( words[i] , words[pos] );
+			strcpy ( words[pos] , temp );
+		}
+
+
+	}	
 }
