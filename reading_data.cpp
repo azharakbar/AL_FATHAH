@@ -19,6 +19,7 @@ extern void hit_enter () ;
 
 extern char sdate[20] ;
 extern int read_ctr = 0 ;
+extern bool threadFinishPoint ;
 
 int date_validation ( string , int i , char ch ) ;
 int is_available ( char items[] , int size , char d ) ;
@@ -42,6 +43,15 @@ extern void read_data ( char data[] , int x , int y , int max_size , int special
 				data_  = 8 ;
 				continue ;
 			}
+
+			if ( (int)data_ == 27 )
+			{
+				strcpy ( data , "-1" ) ;
+				gotoxy ( x , y ) ;
+				for ( int j = 0 ; j <= i ; ++j )
+					printf(" ") ;
+				return ;
+			}			
 			
 			if ( (int)data_  != 8 && (int)data_  != 13 ) 
 				if ( i != max_size-2 )
@@ -521,6 +531,7 @@ extern void read_data_continuous ( string* d , int x , int y , int max_size , in
 
 
 			data_ = _getch();
+			threadFinishPoint = true ;
 
 			if ( *n && (int)data_ == 13 )
 			{

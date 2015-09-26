@@ -5,13 +5,14 @@
 #include <vector>
 #include <windows.h>
 #include <iomanip>
+#include <process.h>
 
 using namespace std ;
 
 class fee_details ;
 
 extern void fee_central_control ( int choice ) ;
-extern void fee_student_init ( int admno , char date []  ) ;
+extern void fee_student_init ( int admno , char date [] , char special[]  ) ;
 
 extern void header () ;
 extern int general_tasks ( string type , int* data = 0 ) ; 
@@ -28,6 +29,8 @@ extern string get_student_name ( int admno ) ;
 extern string get_student_class ( int admno ) ;
 extern string get_last_payed ( int admno ) ;
 extern void display_msg_static ( string ) ;
+extern void hit_enter ( int x , int y ) ;
+extern void set_news ( string news , int id ) ;
 
 extern int  show_student_data_brief ( int admno , int* lp ) ;
 extern fee_details show_fee_data_brief ( int admno , int* status ) ;
@@ -35,6 +38,8 @@ extern fee_details show_fee_data_brief ( int admno , int* status ) ;
 extern int grab_date ( char [] , char [] ) ;
 extern string convert_month ( int id ) ;
 extern void generate_avail_list ( char start[] , char end[] , vector<string>& list ) ;
+extern void blink_text ( void* text ) ;
+extern bool news_control ;
 
 int  fee_pay () ;
 int  view_fee_defaulters () ;
@@ -43,6 +48,7 @@ void view_fee_stats () ;
 extern int read_ctr ;
 extern int next_admno ;
 extern char sdate[20]  ;
+extern bool threadFinishPoint ;
 
 class fee_details
 {
@@ -53,6 +59,7 @@ public:
 	char date_admitted[15] ;
 	char last_payd[20] ;
 	char to_pay[20] ;
+	char special_encode[15] ;
 
 	fee_details ()
 	{
@@ -62,6 +69,7 @@ public:
 		strcpy ( date_admitted , "NOT INIT" ) ;
 		strcpy ( last_payd , "0" ) ;
 		strcpy ( to_pay , "0" ) ;
+		strcpy ( special_encode , "0" ) ;		
 	}
 
 	void set_admno ( int d )
@@ -151,6 +159,10 @@ public:
 		else
 			cout << setw(8) << calc_date_diff ( date_admitted , sdate ) << endl ;
 	}
+	void set_special ( char data[] )
+	{
+		strcpy ( special_encode , data ) ;
+	}	
 }fee_global;
 
 
@@ -229,11 +241,44 @@ fee_details search_fee_file ( int admno )
 
 }
 
-extern void fee_student_init ( int admno , char date [] )
+extern void fee_student_init ( int admno , char date [] , char special[] )
 {
 	fee_details f ;
+	char m[5] = "" , temp [20] = "" , d[15] = "01/" ;
+
 	f.set_admno ( admno ) ;
 	f.set_date  ( date ) ;
+	f.set_special ( special ) ;
+
+	if ( special[0] == '1' && special[2] == '0' && !f.fee_init )
+	{	
+		f.fee_init = 1 ;
+
+		string asd = convert_month ( grab_date ( sdate , "month") ) ;
+		asd += " " ;
+		strcpy ( temp , "" ) ;
+		itoa ( grab_date ( sdate , "year" ) , temp , 10 ) ;
+		asd += temp ;
+
+		convert ( asd , temp ) ;
+
+		strcpy  ( f.last_payd , temp ) ;
+		int mnth = grab_date ( sdate , "month" ) ;
+		int yr  = grab_date ( sdate , "year" ) ;
+		if ( mnth == 12 ) { mnth = 1 ; ++yr ; }
+		else ++mnth ;
+		if ( mnth >= 1 && mnth <= 9 ) strcpy ( m , "0" ) ;
+		itoa ( mnth , temp , 10 ) ;
+		strcat ( m , temp ) ;
+		strcat ( d , m ) ; 
+		strcat ( d , "/" ) ;
+		strcpy ( temp , "" ) ;
+		strcpy ( m , "" ) ;
+		itoa ( yr , temp , 10 ) ;
+		strcat ( d, temp ) ;
+		strcpy ( f.to_pay , d ) ;
+	}
+
 
 	FILE *fp ;
 
@@ -306,7 +351,8 @@ START_FEE_PAY:
 		}
 
 	}
-
+	threadFinishPoint = true ;
+	Sleep ( 200 ) ;	
 	fee_global = f ;
 
 	gotoxy ( 64 , 25 ) ;
@@ -352,29 +398,64 @@ START_FEE_PAY:
 	gotoxy ( 88 , 31 ) ;
 	cout << no+1 << endl ;
 
-	gotoxy ( 88 , 33 ) ;
-	if ( strcmp ( f.last_payd , "0" ) )
+	if ( f.special_encode[0] == '0' )
 	{
-		if (lp)
-			general_tasks ( "get_lp_fee" ,  &total) ;
-		else
-			general_tasks ( "get_up_fee" , &total ) ;
+		if ( strcmp ( f.last_payd , "0" ) )
+		{
+			if (lp)
+				general_tasks ( "get_lp_fee" ,  &total) ;
+			else
+				general_tasks ( "get_up_fee" , &total ) ;
 
-		total = total * ( no+ 1 ) ;
+			total = total * ( no+ 1 ) ;
+		}
+		else
+		{
+/*			if (lp)
+				general_tasks ( "get_lp_fee" , &total) ;
+			else
+				general_tasks ( "get_up_fee" , &total) ;
+
+			total = total * ( no+ 1 ) ;*/
+
+			general_tasks ( "get_adm_fee" , &total ) ;
+
+		}
 	}
+
 	else
 	{
-		if (lp)
-			general_tasks ( "get_lp_fee" , &total) ;
+		if ( strcmp ( f.last_payd , "0" ) )
+		{
+			int val = 0 , k = 0 ;
+
+			for ( k = 2 ; f.special_encode[k] != '-' ; ++k ) ;
+
+			for ( ++k ; f.special_encode[k] != '\0' ; ++k )
+				val = ( val*10 ) + ( f.special_encode[k] - 48 ) ;
+
+			total = total + ( val * ( no + 1 ) ) ;
+		}
 		else
-			general_tasks ( "get_up_fee" , &total) ;
+		{
+			int val = 0 , k = 0 ;
 
-		total = total * ( no+ 1 ) ;
+			for ( k = 2 ; f.special_encode[k] != '-' ; ++k )
+				val = ( val*10 ) + ( f.special_encode[k] - 48 ) ;
 
-		general_tasks ( "get_adm_fee" , &total ) ;
+			total += val ;
 
+/*			val = 0 ;
+
+			for ( ++k ; f.special_encode[k] != '\0' ; ++k )
+				val = ( val*10 ) + ( f.special_encode[k] - 48 ) ;
+
+			total = total + ( val * ( no + 1 ) ) ;*/
+
+		}		
 	}
 
+	gotoxy ( 88 , 33 ) ;
 	cout << total ;
 
 	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
@@ -397,7 +478,7 @@ START_FEE_PAY:
 	return 0 ;
 }
 
-extern fee_details show_fee_data_brief ( int admno , int *status ) 
+extern fee_details show_fee_data_brief  ( int admno , int *status ) 
 {
 	static int clean = 0 ;
 
@@ -430,6 +511,12 @@ extern fee_details show_fee_data_brief ( int admno , int *status )
 		*status = 1 ;
 	}
 
+	if ( f.special_encode[0] == '1' )
+	{
+		threadFinishPoint = false ;
+		_beginthread ( blink_text , 0 , (char*)"!!! SPECIAL FEES !!!" ) ;
+	}
+
 	return f ;
 }
 
@@ -441,6 +528,9 @@ int view_fee_defaulters ()
 
 	fstream file ;
 
+	HANDLE h ;
+
+START :
 	header();
 	gotoxy(76 , 8) ;
 	cout<<"FEE DEFAULTERS"<<endl;
@@ -486,24 +576,40 @@ int view_fee_defaulters ()
 			++no;
 		}
 
-
 		++y ;
+
+		if ( y % 16 == 0  && y < next_admno ) 
+		{
+			threadFinishPoint = false ;
+			char text[] = "!!! HIT >> ENTER << TO VIEW MORE !!!" ;
+			h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+			hit_enter ( 0 , 0 ) ;
+			threadFinishPoint = true ;			
+			goto START ;
+		}		
 	}
 	if ( no )
 	{
-		char temp[5] = "" ;
+		char temp[5] = "" , text[100] = "" ;
 		itoa ( no , temp , 10 ) ;
-		string msg = "<< ** >> FEE DEFAULTERS :: " ;
-		msg += temp ;
-		msg += " << ** >>" ;
-		display_msg_static ( msg ) ;
+		strcpy ( text , "<< ** >> FEE DEFAULTERS :: " ) ;
+		strcat ( text , temp ) ;
+		strcat ( text ,  " << ** >>" ) ;
+
+		threadFinishPoint = false ;
+		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+		hit_enter ( 0 , 0 ) ;
+		threadFinishPoint = true ;
+
 	}
 	else
 	{
-		display_msg_static ( "***** NO FEE DEFAULTERS *****") ;
+		threadFinishPoint = false ;
+		char text[] = "***** NO FEE DEFAULTERS *****" ;
+		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+		hit_enter ( 0 , 0 ) ;
+		threadFinishPoint = true ;
 	}
-			cin.get () ;
-
 
 	file.close () ;
 

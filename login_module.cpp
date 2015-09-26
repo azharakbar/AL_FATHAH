@@ -375,16 +375,44 @@ extern void  authenticate ( char login_details[] )
 extern void blink_text ( void* text )
 {
 	int i = 0 ;
+	int x = 84 - ( strlen ((char*)text) / 2 ) ;
 
 	while ( 1 )
 	{
-		gotoxy ( 78 , 29 ) ;
-		cout << (char*)text ; 
+		if (  threadFinishPoint == true  ) 
+		{
+			gotoxy ( x , 52 ) ;
+			cout << "                                                " <<endl ;
+			break ;
+		}
+		gotoxy ( x , 52 ) ;
+		cout << (char*)text << endl ; 
+		if (  threadFinishPoint == true  ) 
+		{
+			gotoxy ( x , 52 ) ;
+			cout << "                                                " <<endl ;
+			break ;
+		}
 		Sleep(500) ;
-		gotoxy ( 78 , 29 ) ;
-		cout << "           " ;
+		if (  threadFinishPoint == true  ) 
+		{
+			gotoxy ( x , 52 ) ;
+
+			cout << "                                                " <<endl ;
+			break ;
+		}
+		gotoxy ( x , 52 ) ;
+		cout << "                                                " <<endl ;
+		if (  threadFinishPoint == true  ) 
+		{
+			gotoxy ( x , 52 ) ;
+			cout << "                                                " <<endl ;
+			break ;
+		}
 		Sleep ( 500 ) ;	
 	}
+	
+	_endthread () ;
 }
 
 extern void write_login_details ( char user[] , char pwd[] )

@@ -152,18 +152,18 @@ extern int admin_menu ()
 	gotoxy(58,19); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	gotoxy(58,20); cout<<(char)186<<"     2.  CHANGE FEE STRUCTURE                    "<<(char)186<<endl;
 	gotoxy(58,21); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,22); cout<<(char)186<<"     3.  MAIN MENU                               "<<(char)186<<endl;
+	gotoxy(58,22); cout<<(char)186<<"     3.  CREATE BACKUP                           "<<(char)186<<endl;
 	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-/*	gotoxy(58,24); cout<<(char)186<<"     4.  LOG OFF                                 "<<(char)186<<endl;
+	gotoxy(58,24); cout<<(char)186<<"     4.  MAIN MENU                               "<<(char)186<<endl;
 	gotoxy(58,25); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,26); cout<<(char)186<<"     5.  EXIT                                    "<<(char)186<<endl;
+/*	gotoxy(58,26); cout<<(char)186<<"     5.  EXIT                                    "<<(char)186<<endl;
 	gotoxy(58,27); cout<<(char)219<<"                                                 "<<(char)219<<endl;*/
-	gotoxy(58,24);
+	gotoxy(58,26);
 	for(i=0;i<51;++i)
 		cout<<(char)223;
 	cout<<endl;	
 
-	int pos = menu_control ( 60 , 18 , 22 ) ;
+	int pos = menu_control ( 60 , 18 , 24 ) ;
 
 	pos = (pos+2)/2 ;
 

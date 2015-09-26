@@ -5,6 +5,7 @@
 #include <vector>
 #include <windows.h>
 #include <iomanip>
+#include <process.h>
 
 using namespace std ;
 
@@ -18,11 +19,20 @@ extern void read_data ( char data[] , int x , int y , int max_size , int special
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void display_msg_static ( string msg )  ;
+extern void hit_enter ( int x , int y ) ;
+extern void blink_text ( void* text ) ;
+extern void set_news ( string news , int id ) ;
 
 extern void admin_central_control ( int ) ;
+extern bool threadFinishPoint ;
+extern bool news_control ;
+
+extern char sdate[20] ;
+extern char stime[20] ;
 
 int change_fee_structure () ;
 int change_login_credits () ;
+void create_backup () ;
 
 extern void admin_central_control ( int choice ) 
 {
@@ -33,9 +43,12 @@ extern void admin_central_control ( int choice )
 			x = change_login_credits () ;
 			break ;
 		case 2 :
-			x = change_fee_structure () ;
+			x = change_fee_structure () ;			
 			break ;
 		case 3 :
+			create_backup () ;
+			return ;
+		case 4 :
 			return ;
 
 	}	
@@ -47,6 +60,7 @@ int change_fee_structure ()
 	int i = 0 , j = 0 ;
 	int d1 = 0 , d2 = 0 , d3 = 0 , fees = 0 ;
 	string data = "" ;
+	HANDLE h ;
 
 	header();
 	gotoxy(74 , 8) ;
@@ -151,6 +165,11 @@ int change_fee_structure ()
 		{
 			general_tasks ( "set_up_fee" , &fees ) ;	
 		}	
+		threadFinishPoint = false ;
+		char text[] = "!!!===== FEE STRUCTURE UPDATED =====!!!" ;
+		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+		hit_enter ( 0 , 0 ) ;
+		threadFinishPoint = true ;				
 		return 1 ;
 	}	
 
@@ -162,6 +181,7 @@ int change_login_credits ()
 {
 	int i = 0 , j = 0 ;
 	char username[100] = "" , password[100] = "" , pwd[100] = "" , login_entered[200] = "" ;
+	HANDLE h ;
 
 	header();
 	gotoxy(72 , 8) ;
@@ -185,7 +205,6 @@ int change_login_credits ()
 	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
 	cout << (char)188 << endl ;
 
-	//gotoxy ( 71 , 14) ; cout << "** CURRENT FEE STRUCTURE **" ;
 	gotoxy ( 64 , 17 ) ; cout << "   CURRENT USERNAME  : " << endl ;	
 	gotoxy ( 64 , 19 ) ; cout << "   CURRENT PASSWORD  : " << endl ;
 	gotoxy ( 66 , 21 ) ; for ( i = 0 ; i < 37 ; ++i ) cout << (char)196 ; cout << endl ;
@@ -194,6 +213,9 @@ int change_login_credits ()
 	gotoxy ( 64 , 27 ) ; cout << "   CONFIRM PASSWORD  : " << endl ;
 
 	read_data ( username , 87 , 17 , 20 , 0 ) ;	
+
+	if ( !strcmp ( username , "-1" ) ) return 0 ;
+
 	read_data ( password , 87 , 19 , 20 , 1 ) ;
 
 	strcpy ( login_entered , username ) ;
@@ -209,15 +231,70 @@ int change_login_credits ()
 
 	authenticate ( login_entered ) ;
 
+	char text[100] = "" ;
+
 	if ( !strcmp ( login_entered , "success") && !strcmp ( password , pwd ) )
 	{
 		write_login_details ( username , password ) ;
-		display_msg_static ( "===== LOGIN CREDENTIALS CHANGED SUCCESSFULLY =====");
+		strcpy ( text ,  "===== LOGIN CREDENTIALS CHANGED SUCCESSFULLY =====" ) ;
 	}
 	else
-		display_msg_static ( "===== LOGIN CREDENTIALS CHANGE FAILED =====");
+		strcpy ( text , "===== LOGIN CREDENTIALS CHANGE FAILED =====" );
 
-	cin.get () ;
+	threadFinishPoint = false ;
+	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+	hit_enter ( 0 , 0 ) ;
+	threadFinishPoint = true ;		
 
 	return 0 ;
+}
+
+void create_backup () 
+{
+	char fname[15] = "" , text[200] = "" ;
+	int i = 0 , j = 0 ;
+
+	for ( i = 0 ; sdate[i] != '\0' ; ++i )
+		if ( isdigit ( sdate[i] ) )
+			fname[j++] = sdate [i] ;
+
+	for ( i = 0 ; stime[i] != '\0' ; ++i )
+		if ( isdigit ( stime[i] ) )
+			fname[j++] = stime[i] ;
+
+	fname[j] = '\0' ;
+	char dir[30] = "C:\\BACKUP\\" ;
+	strcat ( dir , fname ) ;
+
+	char cmd[70] = "mkdir " ;
+	strcat ( cmd , dir ) ;
+	system ( cmd ) ;
+
+
+	strcpy ( cmd , "copy /Y " ) ;
+	strcat ( cmd , "gen_db.bin ") ;
+	strcat ( cmd , dir ) ;
+	strcat ( cmd , " > t.txt") ;
+	system ( cmd ) ;
+
+	strcpy ( cmd , "copy /Y " ) ;
+	strcat ( cmd , "stud_db.bin ") ;
+	strcat ( cmd , dir ) ;
+	strcat ( cmd ," > t.txt") ;
+	system ( cmd ) ;
+
+	strcpy ( cmd , "copy /Y " ) ;
+	strcat ( cmd , "fee_db.bin ") ;
+	strcat ( cmd , dir ) ;
+	strcat ( cmd ," > t.txt") ;
+	system ( cmd ) ;		
+
+	strcpy ( text , "!!! << BACKUP CREATED SUCCESSFULLY >> !!!") ;
+
+	remove ( "t.txt" ) ;
+	threadFinishPoint = false ;
+	HANDLE h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+	hit_enter ( 0 , 0 ) ;
+	threadFinishPoint = true ;		
+
 }

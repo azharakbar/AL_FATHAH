@@ -7,6 +7,11 @@
 
 using namespace std ;
 
+struct news_feed
+{
+	string headline ;
+}news;
+
 struct fees
 {
 	int adm_fee ;
@@ -75,11 +80,14 @@ extern string next_month ( int , int ) ;
 extern void generate_avail_list ( char start[] , char end[] ) ;
 extern int calc_date_diff ( char start[] , char end[] ) ;
 extern void lexi_sort ( char words[][50] , int n  ) ;
+extern void set_news ( string news , int id ) ;
+extern void news_roll ( void* ) ;
 
 extern char sdate[20] = "" ;
 extern char stime[20] = "" ;
 char pause[20] = "no" ;
 extern bool logged_in ;
+extern bool news_control = true ;
 
 extern void startup_tasks ( void* ) ;
 extern int get_next_adm_no () ;
@@ -599,4 +607,9 @@ extern void lexi_sort ( char words[][50] , int n )
 
 
 	}	
+}
+
+extern void set_news ( string new_news , int id )
+{
+	news.headline = new_news ;
 }

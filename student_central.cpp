@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include <iomanip>
+#include <process.h>
 
 using namespace std ;
 
@@ -19,7 +20,7 @@ extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
 extern void hit_enter ( int x , int y ) ;
 extern int  find_age  ( string data ) ;
-extern void fee_student_init ( int admno , char [] ) ;
+extern void fee_student_init ( int admno , char [] , char[] ) ;
 extern string get_student_name ( int admno ) ;
 extern string get_student_class ( int admno ) ;
 extern void display_msg_static ( string ) ;
@@ -27,10 +28,14 @@ extern int grab_date ( char [] , char [] ) ;
 extern string get_last_payed ( int admno ) ;
 extern int menu_control ( int  x , int start_y , int end_y , int esc ) ;
 extern void lexi_sort ( char words[][50] , int n ) ;
+extern void blink_text ( void* text ) ;
+extern int general_tasks ( string , int* data = 0 ) ;
+extern void set_news ( string news , int id ) ;
 
 extern int show_student_data_brief ( int admno , int *lp ) ;
 
 extern int next_admno ;
+extern bool news_control ;
 
 int new_student_entry () ;
 int edit_student_entry () ;
@@ -42,6 +47,7 @@ student_data search_student_file ( int* admno ) ;
 
 extern void convert ( string d , char cnvt[] ) ;
 extern char sdate[20] ;
+extern bool threadFinishPoint ;
 
 struct address
 {
@@ -72,7 +78,6 @@ public:
 	int age ;
 
 	char class_admitted[5] ;
-	
 
 		student_data () 
 		{
@@ -245,7 +250,9 @@ int new_student_entry ()
 
 	int i = 0 , j = 0 ;
 	string data = "" ;
+	char special_encode[12] = "" ;
 	data.reserve ( 50 ) ;
+	HANDLE h ;
 
 START:
 	header();
@@ -253,7 +260,7 @@ START:
 	cout<<"NEW STUDENT ENTRY"<<endl;
 	gotoxy(74,9);
 	for ( i = 1 ; i <= strlen ("NEW STUDENT ENTRY")+1 ; ++i )
-		cout<<char(205);		//11
+		cout<<char(205);		
 	cout << endl ;
 
 	gotoxy ( 5 , 12 ) ;
@@ -346,6 +353,23 @@ START:
 	gotoxy ( 101 , 20 ) ; cout << " >>  PIN            : " << endl ;
 	gotoxy ( 101 , 22 ) ; cout << " >>  PHONE          : " << endl ;
 
+	gotoxy ( 98, 27 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 2 ; ++j )
+	{	
+		gotoxy ( 98 , 28+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 58 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 98 , 28+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 100 , 26) ; cout << "** SPECIAL STATUS **" ;
+	gotoxy ( 101 , 29 ) ; cout << " >>  SPECIAL FEES ? : " << endl ;
 
 	gotoxy ( 35 , 14 ) ;
 	if ( next_admno < 10 ) cout << "0000" ;
@@ -525,6 +549,73 @@ READ_PHONE:
 	}
 	s.set_phone ( data ) ;
 
+READ_SPECIAL:
+	data = "" ;
+	string list[] = { "YES" , "NO" } ;
+	read_list ( &data , 124 , 29 , list , 2 ) ;
+	if ( data == "-1" )
+	{
+		gotoxy ( 124 , 22 ) ;
+		printf ( "               " ) ;			
+		goto READ_PHONE;		
+	}	
+
+	if ( data == "YES" )
+	{
+		char temp[5] = "" ;
+
+		strcpy ( special_encode , "1-" ) ;
+		gotoxy ( 98, 27 ) ;
+		cout << (char)201 ;
+		for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+		cout << (char)187 << endl ;
+
+		for ( j = 0 ; j <= 6 ; ++j )
+		{	
+			gotoxy ( 98 , 28+j ) ;
+			cout << (char)186 ;for ( i = 0 ; i <= 58 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+		}
+		gotoxy ( 98 , 28+j ) ;
+		cout << (char)200 ;
+		for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+		cout << (char)188 << endl ;
+
+		gotoxy ( 100 , 26) ; cout << "** SPECIAL STATUS **" ;
+		gotoxy ( 101 , 29 ) ; cout << " >>  SPECIAL FEES ? :  " << data << endl ;		
+		gotoxy ( 101 , 31 ) ; cout << " >>  ADMISSION FEES :  " << endl ;		
+		gotoxy ( 101 , 33 ) ; cout << " >>  TUTION FEES    :  " << endl ;		
+
+		data = "" ;
+		read_data ( &data , 124 , 31 , 6 , 1 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 29 ) ;
+			printf ( "                  " ) ;
+			goto READ_SPECIAL ;			
+		}	
+		data = data + "-" ;
+
+		convert ( data , temp ) ;
+		strcat ( special_encode , temp ) ;
+
+		data = "" ;
+		read_data ( &data , 124 , 33 , 6 , 1 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 29 ) ;
+			printf ( "                  " ) ;			
+			gotoxy ( 124 , 31 ) ;
+			printf ( "                  " ) ;
+			goto READ_SPECIAL ;			
+		}	
+
+		convert ( data , temp ) ;
+		strcat ( special_encode , temp ) ;
+
+	}
+	else
+		strcpy ( special_encode , "0" ) ;
+
 	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
 
 	char decision = ' ' ;
@@ -545,11 +636,16 @@ READ_PHONE:
 
 		fclose ( fp ) ;
 
-		fee_student_init ( s.get_admno() , s.date_admitted ) ;
+		fee_student_init ( s.get_admno() , s.date_admitted , special_encode ) ;
+		general_tasks ( "set_enroll" ) ;
 
-		display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
+		threadFinishPoint = false ;
+		char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
+		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 		hit_enter ( 0 , 0 ) ;
-
+		threadFinishPoint = true ;	
+		goto START ;
+		
 		return 1 ;
 	}
 	else
@@ -569,6 +665,7 @@ int search_student_entry()
 	int adm = 0 ;
 
 	string data = "" ;
+	HANDLE h ;
 
 START:
 	header();
@@ -576,7 +673,7 @@ START:
 	cout<<"SEARCH STUDENT ENTRY"<<endl;
 	gotoxy(73,9);
 	for ( i = 1 ; i <= strlen ("SEARCH STUDENT ENTRY")+2 ; ++i )
-		cout<<char(205);		//11
+		cout<<char(205);		
 	cout << endl ;
 
 	gotoxy ( 5 , 10 ) ;
@@ -618,7 +715,7 @@ START:
 	cout<<"SEARCH STUDENT ENTRY"<<endl;
 	gotoxy(73,9);
 	for ( i = 1 ; i <= strlen ("SEARCH STUDENT ENTRY")+2 ; ++i )
-		cout<<char(205);		//11
+		cout<<char(205);		
 	cout << endl ;
 
 
@@ -714,8 +811,11 @@ START:
 
 	student_global.full_details_display () ;
 
-	display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
+	threadFinishPoint = false ;
+	char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
+	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 	hit_enter ( 0 , 0 ) ;
+	threadFinishPoint = true ;	
 
 	return  0 ;
 }
@@ -725,13 +825,14 @@ int all_student_list ()
 	int i = 0 , j = 0 , y = 1 ;
 	student_data s ;
 	fstream file ;
+	HANDLE h ;
 
 	header();
 	gotoxy(76 , 8) ;
 	cout<<"ALL STUDENT LIST"<<endl;
 	gotoxy(75,9);
 	for ( i = 1 ; i <= strlen ("ALL STUDENT LIST")+2 ; ++i )
-		cout<<char(205);		//11
+		cout<<char(205);		
 	cout << endl ;
 
 	gotoxy ( 12 , 14 ) ; cout << "-- SORTING METHOD -- " << endl ;
@@ -760,7 +861,7 @@ START:
 	cout<<"ALL STUDENT LIST"<<endl;
 	gotoxy(75,9);
 	for ( i = 1 ; i <= strlen ("ALL STUDENT LIST")+2 ; ++i )
-		cout<<char(205);		//11
+		cout<<char(205);		
 	cout << endl ;
 
 	gotoxy ( 9 , 12 ) ;
@@ -799,8 +900,12 @@ START:
 		++y ;
 		if ( y % 16 == 0  && y < next_admno ) 
 		{
-			display_msg_static ( "!!! HIT >> ENTER << TO VIEW MORE !!!") ;
-			hit_enter ( 0 , 0 ) ;			
+			threadFinishPoint = false ;
+			char text[] = "!!! HIT >> ENTER << TO VIEW MORE !!!" ;
+			h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+			hit_enter ( 0 , 0 ) ;
+			threadFinishPoint = true ;	
+
 			goto START ;
 		}
 	}
@@ -808,8 +913,12 @@ START:
 
 	remove ( "temp.bin" ) ;
 
-	display_msg_static ( "!!! HIT >> ENTER << TO CONTINUE !!!") ;
-	hit_enter ( 0 , 0 ) ;			
+	threadFinishPoint = false ;
+	char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
+	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+	hit_enter ( 0 , 0 ) ;
+	threadFinishPoint = true ;	
+
 	return  0 ;
 }
 
@@ -899,8 +1008,8 @@ extern int show_student_data_brief ( int admno , int* lp )
 
 	if ( admno == -1 ) 
 	{
-		gotoxy ( 70 , 17 ) ;
-		cout << "***** STUDENT NOT FOUND *****" ;
+		threadFinishPoint = false ;
+		_beginthread ( blink_text , 0 , (char*)"***** STUDENT NOT FOUND *****" ) ;		
 		clean = 1 ;
 		return 0 ;
 	}

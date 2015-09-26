@@ -36,6 +36,8 @@ extern void fee_central_control ( int ) ;
 extern int admin_menu () ;
 extern void admin_central_control ( int ) ;
 
+extern void news_roll ( void* ) ;
+
 struct msg_list_main
 {
 	int n ;
