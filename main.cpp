@@ -146,7 +146,7 @@ int main ()
 	}
 
 NOW :
-
+			
 	startup_tasks ( NULL ) ;		// delete this line when invalidating the NOW label
 
 	logged_in = true ;	

@@ -471,6 +471,7 @@ START_FEE_PAY:
 		convert ( data , d ) ;
 		strcpy  ( fee_global.last_payd , d ) ;
 		fee_global.set_to_pay ( fee_global.last_payd ) ;
+		general_tasks ( "set_fee_collexn" , &total ) ;
 		return adm ;
 	}
 	else goto START_FEE_PAY ;
@@ -618,7 +619,8 @@ START :
 
 void view_fee_stats () 
 {
-	int i = 0 , j = 0 ;
+	int i = 0 , j = 0 , val = 0 ;
+	HANDLE h ;
 
 	header();
 	gotoxy( 74 , 13 ) ;
@@ -633,21 +635,34 @@ void view_fee_stats ()
 	cout<<endl;
 	
 	gotoxy(58,17); cout<<(char)219<<"                                                 "<<(char)219<<endl;
-	gotoxy(58,18); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	general_tasks ( "get_collexn_day" , &val ) ;
+	gotoxy(58,18); cout<<(char)186<<"   >> FEE COLLECTED TODAY     "<<setw(15)<< val <<"    "<<(char)186<<endl;
 	gotoxy(58,19); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,20); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,21); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,22); cout<<(char)186<<"                                                 "<<(char)186<<endl;
+	general_tasks ( "get_collexn_month" , &val ) ;
+	gotoxy(58,20); cout<<(char)186<<"   >> FEE COLLECTED THIS MONTH"<<setw(15)<< val <<"    "<<(char)186<<endl;
+/*	gotoxy(58,22); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,24); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,25); cout<<(char)219<<"                                                 "<<(char)219<<endl;
-	gotoxy(58,26);
+	gotoxy(58,24); cout<<(char)186<<"                                                 "<<(char)186<<endl;*/
+	gotoxy(58,21); cout<<(char)219<<"                                                 "<<(char)219<<endl;
+	gotoxy(58,22);
 	for(i=0;i<51;++i)
 		cout<<(char)223;
 	cout<<endl;	
 
+	threadFinishPoint = false ;
+	char text[] = "!!! HIT >> ENTER << TO CONTINUE OR HIT >> M << TO VIEW DAILY COLLECTION !!!" ;
+	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 
-	cin.get () ;
+	char decision = ' ' ;
+	char items[] = { 13 , 'M' } ;
+	read_char ( &decision , 0 , 0 , items , 2 ) ;
+
+	if ( decision == 'M' || decision == 'm' ) 
+	{
+		system ("fee_stats.txt") ;
+	}
+	
+	threadFinishPoint = true ;	
 }
 
 extern string get_last_payed ( int admno ) 

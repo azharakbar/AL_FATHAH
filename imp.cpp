@@ -7,6 +7,10 @@
 
 using namespace std ;
 
+extern int grab_date ( char [] , char [] ) ;
+extern char sdate[20] = "" ;
+extern char stime[20] = "" ;
+
 struct news_feed
 {
 	string headline ;
@@ -23,8 +27,12 @@ class general
 {
 	fees fee_struct ;
 	int total_enrolled ;
+	int fee_day ;
+	int fee_month ;
 
 	public:
+		int day ;
+		int month ;		
 		void set_adm_fee ( int d )
 		{
 			fee_struct.adm_fee = d ;
@@ -57,12 +65,53 @@ class general
 		{
 			return total_enrolled ;
 		}
+		void set_date ()
+		{
+			day = grab_date ( sdate , "day" ) ;
+			month = grab_date ( sdate , "month" ) ;			
+		}
+		int get_day ()
+		{
+			return grab_date ( sdate , "day" ) ;
+		}
+		int get_month ()
+		{
+			return grab_date ( sdate , "month" ) ;
+		}
+		void set_fee_day ( int data )
+		{
+			if ( !data ) fee_day = 0 ;
+			else
+			{
+				fee_day += data ;			
+			}
+		}
+		void set_fee_month ( int data )
+		{
+			if ( !data ) fee_month = 0 ;
+			else
+			{
+				fee_month += data ;		
+			}
+		}
+		int get_fee_day	()	
+		{
+			return fee_day ;
+		}
+		int get_fee_month ()		
+		{
+			return fee_month ;
+		}		
 		general ()
 		{
 			fee_struct.adm_fee = 250 ;
 			fee_struct.lp_fee = 150 ;
 			fee_struct.up_fee = 200 ;
 			total_enrolled = 0 ;
+			fee_day = 0 ;
+			fee_month = 0 ;
+			day = 0 ;
+			month = 0 ;
 		}				
 } g ; 
 
@@ -73,7 +122,6 @@ extern void draw_msg_box_static () ;
 extern void exit_screen () ;
 extern void convert ( string d , char cnvt[] ) ;
 extern int  find_age ( string data ) ;
-extern int grab_date ( char [] , char [] ) ;
 extern string convert_month ( int mnth ) ;
 extern int convert_month ( string mnth = "" , char mnt[] = "" ) ;
 extern string next_month ( int , int ) ;
@@ -83,8 +131,6 @@ extern void lexi_sort ( char words[][50] , int n  ) ;
 extern void set_news ( string news , int id ) ;
 extern void news_roll ( void* ) ;
 
-extern char sdate[20] = "" ;
-extern char stime[20] = "" ;
 char pause[20] = "no" ;
 extern bool logged_in ;
 extern bool news_control = true ;
@@ -420,20 +466,66 @@ extern void startup_tasks ( void* params )
 
 	fclose ( fp ) ;	
 
+	fp = fopen ( "fee_stats.txt" , "r" ) ;
+
+	if ( fp == NULL )
+	{
+		fclose ( fp ) ;
+		fp = fopen ( "fee_stats.txt" , "w" ) ;
+	}
+
+	fclose ( fp ) ;	
+
 	fp = fopen ( "gen_db.bin" , "r" ) ;
 
 	if ( fp == NULL )
 	{
 		fclose ( fp ) ;
+		g.day = grab_date ( sdate , "day" ) ;
+		g.month = grab_date ( sdate , "month" ) ;
+		g.set_fee_day ( 0 ) ;
+		g.set_fee_month ( 0 ) ;
+		cout << "set to : " << g.day << "   " << g.month << endl ;		
 		fp = fopen ( "gen_db.bin" , "wb+" ) ;
 		fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
+		fclose ( fp ) ;
 	}
 	else
 	{
 		fclose ( fp ) ;
 		fp = fopen ( "gen_db.bin" , "rb+" ) ;	
 		fread ( &g , sizeof ( general ) , 1 , fp ) ;
-		fclose ( fp ) ;		
+		fclose ( fp ) ;
+
+		if ( g.month != grab_date ( sdate , "month" ) )
+		{
+			fstream file ;
+			file.open ( "fee_stats.txt" , ios::in|ios::out ) ;
+			file.seekp ( 0 , ios::end ) ;
+			file << g.day << "\\" << g.month << "\t\t\t" << g.get_fee_day() << endl ;
+			file << endl << "\t\t  TOTAL FEE COLLECTED IN " << convert_month ( g.month ) << " = " << g.get_fee_month() << endl ;
+			file.close () ;
+			g.set_fee_day ( 0 ) ;
+			g.set_fee_month ( 0 ) ; 
+			g.day = grab_date ( sdate , "day" ) ;
+			g.month = grab_date ( sdate , "month" ) ;
+			fp = fopen ( "gen_db.bin" , "wb" ) ;
+			fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
+			fclose ( fp ) ;			
+		}	
+		else if ( g.day != grab_date ( sdate , "day" ) )
+		{
+			fstream file ;
+			file.open ( "fee_stats.txt" , ios::in|ios::out ) ;
+			file.seekp ( 0 , ios::end ) ;
+			file << g.day << "\\" << g.month << "\t\t\t" << g.get_fee_day() << endl ;
+			file.close () ;
+			g.set_fee_day ( 0 ) ;
+			g.day = grab_date ( sdate , "day" ) ;
+			fp = fopen ( "gen_db.bin" , "wb" ) ;
+			fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
+			fclose ( fp ) ;						
+		}					
 	}		
 
 
@@ -473,6 +565,19 @@ extern int general_tasks ( string type , int* data )
 	{
 		g.set_up_fee ( *data ) ;
 	}
+	else if ( type == "set_fee_collexn" )
+	{
+		g.set_fee_day ( *data ) ;
+		g.set_fee_month ( *data ) ;
+	}
+	else if ( type == "get_collexn_day" )
+	{
+		*data = g.get_fee_day () ;
+	}	
+	else if ( type == "get_collexn_month" )
+	{
+		*data = g.get_fee_month () ;
+	}			
 	if ( type[0] == 's' )
 	{
 		FILE *fp ;

@@ -382,7 +382,7 @@ extern void blink_text ( void* text )
 		if (  threadFinishPoint == true  ) 
 		{
 			gotoxy ( x , 52 ) ;
-			cout << "                                                " <<endl ;
+			cout << "                                                                               " <<endl ;
 			break ;
 		}
 		gotoxy ( x , 52 ) ;
@@ -390,7 +390,7 @@ extern void blink_text ( void* text )
 		if (  threadFinishPoint == true  ) 
 		{
 			gotoxy ( x , 52 ) ;
-			cout << "                                                " <<endl ;
+			cout << "                                                                               " <<endl ;
 			break ;
 		}
 		Sleep(500) ;
@@ -398,15 +398,15 @@ extern void blink_text ( void* text )
 		{
 			gotoxy ( x , 52 ) ;
 
-			cout << "                                                " <<endl ;
+			cout << "                                                                               " <<endl ;
 			break ;
 		}
 		gotoxy ( x , 52 ) ;
-		cout << "                                                " <<endl ;
+		cout << "                                                                                   " <<endl ;
 		if (  threadFinishPoint == true  ) 
 		{
 			gotoxy ( x , 52 ) ;
-			cout << "                                                " <<endl ;
+			cout << "                                                                               " <<endl ;
 			break ;
 		}
 		Sleep ( 500 ) ;	
