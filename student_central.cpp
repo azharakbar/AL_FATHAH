@@ -821,13 +821,31 @@ DISPLAY:
 	{
 		gotoxy ( 35 , 16 ) ;
 		printf("          ") ;
+		data = "" ;
+		read_date ( &data , 35 , 16 , 10 , 1 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 16 ) ;
+			cout << student_global.date_admitted << endl ;		
+			goto DISPLAY;
+		}
+		student_global.set_date_admitted ( data ) ;		
 		
 	}
 	else if ( decision == 'B' || decision == 'b' ) 
 	{
 		gotoxy ( 35 , 18 ) ;
 		printf("          ") ;
-		gotoxy ( 35 , 18 ) ;
+		data = "" ;
+		string list_class[] = { "1" , "2" , "3" , "4" , "5" , "6" , "7" , "8" , "9" , "10" , "11" , "12" } ;
+		read_list ( &data , 35 , 18 , list_class , 12 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 18 ) ;
+			cout << student_global.class_admitted << endl ;
+			goto DISPLAY ;
+		}
+		student_global.set_class_admitted ( data ) ;
 	}
 	else if ( decision == 'C' || decision == 'c' ) 
 	{
@@ -837,7 +855,7 @@ DISPLAY:
 		read_data ( &data , 35 , 25 , 52 , 0 ) ;
 		if ( data == "-1" )
 		{
-			gotoxy ( 35 , 16 ) ;
+			gotoxy ( 35 , 25 ) ;
 			cout << student_global.student_name << endl ;		
 			goto DISPLAY;
 		}
