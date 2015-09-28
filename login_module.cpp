@@ -45,7 +45,7 @@ extern void login_module ( void* params )
 }
 
 
-void retrieve_login_details ( void* param )
+extern void retrieve_login_details ( void* param )
 {
 	int i = 0 ;
 

@@ -69,7 +69,7 @@ int main ()
 	WaitForSingleObject((HANDLE)_beginthread ( draw_banner_line , 0 , NULL ) , INFINITE ) ;
 
 	WaitForSingleObject ( (HANDLE)_beginthread ( login_module , 0 , NULL ) , INFINITE ) ;
-	
+
 	WaitForSingleObject( (HANDLE)_beginthread ( draw_msg_box , 0 , NULL ) , INFINITE ) ;
 
 

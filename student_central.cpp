@@ -231,6 +231,7 @@ extern void student_central_control ( int choice )
 			x = new_student_entry () ;
 			break ;
 		case 2 :
+			x = edit_student_entry () ;
 			break ;
 		case 3 :
 			x = search_student_entry () ;
@@ -656,6 +657,411 @@ READ_SPECIAL:
 
 int edit_student_entry()
 {
+	int i = 0 , j = 0 , lp = 0 ;
+	int adm = 0 ;
+
+	string data = "" ;
+	HANDLE h ;
+
+START:
+	header();
+	gotoxy(75 , 8) ;
+	cout<<"EDIT STUDENT ENTRY"<<endl;
+	gotoxy(74,9);
+	for ( i = 1 ; i <= strlen ("EDIT STUDENT ENTRY")+2 ; ++i )
+		cout<<char(205);		
+	cout << endl ;
+
+	gotoxy ( 5 , 10 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 30 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	gotoxy ( 6 , 11 ) ;
+	cout << " >> ADMISSION NUMBER :  " ;
+
+	gotoxy ( 5 , 12 ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 30 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 73 , 14 ) ; cout << "||| SEARCH RESULTS |||"<<endl ;
+
+	data = "" ;
+	adm = 0 ;
+	lp = 0 ;
+
+	while ( data != "done" )
+	{
+		read_data_continuous ( &data , 30 , 11 , 8 , 1 , &adm ) ;
+		if ( data == "-1" )
+		{
+			return 0 ;
+		}
+
+		int found =	show_student_data_brief ( adm , &lp ) ;
+
+		if ( !found )
+			data = "" ;
+
+	}
+
+DISPLAY:
+	header();
+	gotoxy(74 , 8) ;
+	cout<<"SEARCH STUDENT ENTRY"<<endl;
+	gotoxy(73,9);
+	for ( i = 1 ; i <= strlen ("SEARCH STUDENT ENTRY")+2 ; ++i )
+		cout<<char(205);		
+	cout << endl ;
+
+
+	gotoxy ( 5 , 12 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 6 ; ++j )
+	{	
+		gotoxy ( 5 , 13+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 40 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 13+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 40 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 11) ; cout << "** OFFICIAL INFO **" ;
+	gotoxy ( 6 , 14 ) ; cout << " >>  ADMISSION NUMBER     : " << endl ;
+	gotoxy ( 6 , 16 ) ; cout << " A:  DATE  OF ADMISSION   : " << endl ;
+	gotoxy ( 6 , 18 ) ; cout << " B:  CLASS OF ADMISSION   : " << endl ;
+
+
+
+	gotoxy ( 5 , 23 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 10 ; ++j )
+	{	
+		gotoxy ( 5 , 24+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 85 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 24+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 22) ; cout << "** PERSONAL INFO **" ;
+	gotoxy ( 6 , 25 ) ; cout << " C:  STUDENT NAME         : " << endl ;
+	gotoxy ( 6 , 27 ) ; cout << " D:  GENDER               : " << endl ;
+	gotoxy ( 6 , 29 ) ; cout << " E:  DATE OF BIRTH        : " << endl ;
+	gotoxy ( 6 , 31 ) ; cout << " >>  AGE                  : " << endl ;
+	gotoxy ( 6 , 33 ) ; cout << " F:  SCHOOL               : " << endl ;
+
+
+
+	gotoxy ( 5 , 38 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 8 ; ++j )
+	{	
+		gotoxy ( 5 , 39+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 85 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 5 , 39+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 85 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 7 , 37) ; cout << "** PARENTAL & GUARDIAN INFO **" ;
+	gotoxy ( 6 , 40 ) ; cout << " G:  FATHER'S NAME        : " << endl ;
+	gotoxy ( 6 , 42 ) ; cout << " H:  MOTHER'S NAME        : " << endl ;
+	gotoxy ( 6 , 44 ) ; cout << " I:  GUARDIAN'S NAME      : " << endl ;
+	gotoxy ( 6 , 46 ) ; cout << " J:  RELATION             : " << endl ;
+   
+
+	gotoxy ( 98, 12 ) ;
+	cout << (char)201 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)187 << endl ;
+
+	for ( j = 0 ; j <= 10 ; ++j )
+	{	
+		gotoxy ( 98 , 13+j ) ;
+		cout << (char)186 ;for ( i = 0 ; i <= 58 ; ++i ) cout << ' '	; cout << (char)186 << endl ;
+	}
+	gotoxy ( 98 , 13+j ) ;
+	cout << (char)200 ;
+	for ( i = 0 ; i <= 58 ; ++i ) cout << (char)205 	;
+	cout << (char)188 << endl ;
+
+	gotoxy ( 100 , 11) ; cout << "** CONTACT INFO **" ;
+	gotoxy ( 101 , 14 ) ; cout << " K:  HOUSE NAME     : " << endl ;
+	gotoxy ( 101 , 16 ) ; cout << " L:  CITY / TOWN    : " << endl ;
+	gotoxy ( 101 , 18 ) ; cout << " M:  POST OFFICE    : " << endl ;
+	gotoxy ( 101 , 20 ) ; cout << " N:  PIN            : " << endl ;
+	gotoxy ( 101 , 22 ) ; cout << " O:  PHONE          : " << endl ;
+
+	student_global.full_details_display () ;
+
+	display_msg_static ("--- ENTER THE FIELD NUMBER TO EDIT ---") ;
+
+	char decision = ' ' ;
+	char items[] = { 'A' , 'B' , 'C', 'D' , 'E' , 'F' , 'G', 'H' , 'I' , 'J' , 'K' , 'L' , 'M' , 'N' , 'O'  } ;
+	read_char ( &decision , 0 , 0 , items , 15 ) ;
+
+	if ( decision == '0' )
+		return 0 ;
+
+	if ( decision == 'A' || decision == 'a' ) 
+	{
+		gotoxy ( 35 , 16 ) ;
+		printf("          ") ;
+		
+	}
+	else if ( decision == 'B' || decision == 'b' ) 
+	{
+		gotoxy ( 35 , 18 ) ;
+		printf("          ") ;
+		gotoxy ( 35 , 18 ) ;
+	}
+	else if ( decision == 'C' || decision == 'c' ) 
+	{
+		gotoxy ( 35 , 25 ) ;
+		printf("                                    ") ;
+		data = "" ;
+		read_data ( &data , 35 , 25 , 52 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 16 ) ;
+			cout << student_global.student_name << endl ;		
+			goto DISPLAY;
+		}
+		student_global.set_student_name ( data ) ;		
+	}
+	else if ( decision == 'D' || decision == 'd' ) 
+	{
+		gotoxy ( 35 , 27 ) ;
+		printf("      ") ;
+		data = "" ;
+		string gen_list[] = { "MALE" , "FEMALE" } ;
+		read_list ( &data , 35 , 27 , gen_list , 2 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 27 ) ;
+			cout << student_global.gender << endl ;
+			goto DISPLAY ;		
+		}
+		student_global.set_student_gender ( data ) ;
+	}
+	else if ( decision == 'E' || decision == 'e' ) 
+	{
+		gotoxy ( 35 , 29 ) ;
+		printf("          ") ;
+		data = "" ;
+		read_date ( &data , 35 , 29 , 10 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 29 ) ;
+			cout << student_global.dob << endl ;
+			goto DISPLAY ;
+		}
+		student_global.set_dob ( data ) ;
+		student_global.set_age ( find_age ( data ) ) ;
+		gotoxy ( 35 , 31 ) ; cout << find_age ( data ) << endl ;
+	}
+	else if ( decision == 'F' || decision == 'f' ) 
+	{
+		gotoxy ( 35 , 33 ) ;
+		printf("                                    ") ;
+		data = "" ;
+		read_data ( &data , 35 , 33 , 32 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 33 ) ;
+			cout << student_global.skul_name << endl ;
+			goto DISPLAY ;			
+		}
+		student_global.set_skul_name ( data ) ;
+	}
+	else if ( decision == 'G' || decision == 'g' ) 
+	{
+		gotoxy ( 35 , 40 ) ;
+		printf("                                    ") ;
+		data = "" ;
+		read_data ( &data , 35 , 40 , 52 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 40 ) ;
+			cout << student_global.father_name << endl ;
+			goto DISPLAY;			
+		}
+		student_global.set_father_name ( data ) ;
+	}
+	else if ( decision == 'H' || decision == 'h' ) 
+	{
+		gotoxy ( 35 , 42 ) ;
+		printf("                                    ") ;
+		data = "" ;
+		read_data ( &data , 35 , 42 , 52 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 42 ) ;
+			cout << student_global.mother_name << endl ;
+			goto DISPLAY;			
+		}
+		student_global.set_mother_name ( data ) ;
+	}
+	else if ( decision == 'I' || decision == 'i' ) 
+	{
+		gotoxy ( 35 , 44) ;
+		printf("                                    ") ;
+		data = "" ;
+		read_data ( &data , 35 , 44 , 52 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 44 ) ;
+			cout << student_global.guard_name << endl ;
+			goto DISPLAY ;
+		}
+		student_global.set_guard_name ( data ) ;	
+	}
+	else if ( decision == 'J' || decision == 'j' ) 
+	{
+		gotoxy ( 35 , 46 ) ;
+		printf("          ") ;
+		data = "" ;
+		string rltn_list[] = { "FATHER" , "MOTHER" , "BROTHER" , "SISTER" , "UNCLE" , "AUNTY" , "OTHER" } ;
+		read_list ( &data , 35 , 46 , rltn_list , 7 ) 	;
+		if ( data == "-1" )
+		{
+			gotoxy ( 35 , 46 ) ;
+			cout << student_global.relation << endl ;
+			goto DISPLAY ;
+		}
+		student_global.set_student_relation ( data ) ;
+	}
+	else if ( decision == 'K' || decision == 'k' ) 
+	{
+		gotoxy ( 124 , 14 ) ;
+		printf("                               ") ;
+		data = "" ;
+		read_data ( &data , 124 , 14 , 32 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 14 ) ;
+			cout << student_global.addr.hname << endl ;
+			goto DISPLAY ;			
+		}
+		student_global.set_addr_hname( data ) ;
+	}
+	else if ( decision == 'L' || decision == 'l' ) 
+	{
+		gotoxy ( 124 , 16 ) ;
+		printf("                               ") ;
+		data = "" ;
+		read_data ( &data , 124 , 16 , 22 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 16 ) ;
+			cout << student_global.addr.place << endl ;
+			goto DISPLAY ;			
+		}
+		student_global.set_addr_place ( data ) ;
+	}
+	else if ( decision == 'M' || decision == 'm' ) 
+	{
+		gotoxy ( 124 , 18 ) ;
+		printf("                               ") ;
+		data = "" ;
+		read_data ( &data , 124 , 18 , 22 , 0 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 18 ) ;
+			cout << student_global.addr.post << endl ;		
+			goto DISPLAY ;
+		}
+		student_global.set_addr_post ( data ) ;
+	}
+	else if ( decision == 'N' || decision == 'n' ) 
+	{
+		gotoxy ( 124 , 20 ) ;
+		printf("          ") ;
+		data = "" ;
+		read_data ( &data , 124 , 20 , 8 , 1 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 20 ) ;
+			cout << student_global.addr.pin << endl ;		
+			goto DISPLAY ;	
+		}
+		student_global.set_addr_pin ( data ) ;
+	}													
+	else if ( decision == 'O' || decision == 'o' ) 
+	{
+		gotoxy ( 124 , 22 ) ;
+		printf("              ") ;
+		data = "" ;
+		read_data ( &data , 124 , 22 , 13 , 1 ) ;
+		if ( data == "-1" )
+		{
+			gotoxy ( 124 , 22 ) ;
+			cout << student_global.phone << endl ;		
+			goto DISPLAY ;			
+		}
+		student_global.set_phone ( data ) ;
+	}
+
+	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
+
+	char dcsn = ' ' ;
+	char Items[] = { 'Y' , 'N' } ;
+	read_char ( &dcsn , 0 , 0 , Items , 2 ) ;
+
+	if ( dcsn == 'Y' || dcsn == 'y' ) 
+	{
+		student_data x ;
+		int y = 1 ;
+
+		fstream oldfile ;
+		fstream newfile ;
+		oldfile.open ( "stud_db.bin" , ios::in | ios::binary ) ;
+		newfile.open ( "temp.bin" , ios::out | ios::binary ) ;
+
+		while ( y < next_admno )
+		{
+			oldfile.read (( char* ) &x , sizeof(student_data) ) ;
+			if ( x.adm_no == student_global.adm_no )
+			{
+				x = student_global ;
+			}
+			newfile.write (( char* ) &x , sizeof ( student_data ) ) ;
+			++y ;
+		}
+		oldfile.close() ;
+		newfile.close() ;
+
+		remove ( "stud_db.bin" );
+		system ( "rename temp.bin stud_db.bin" );
+
+
+		threadFinishPoint = false ;
+		char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
+		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+		hit_enter ( 0 , 0 ) ;
+		threadFinishPoint = true ;	
+		goto START ;
+		
+		return 1 ;
+	}
+	else
+		goto START ;
+
+
 	return  0 ;
 }
 
