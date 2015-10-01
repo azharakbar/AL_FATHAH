@@ -104,7 +104,10 @@ extern void read_date ( string* d , int x , int y , int max_size , int today )
 		{
 			data_ = _getch();
 			
-			if ( !i && (int)data_  == 13 ) 
+			if ( (int)data_ == 13 && ( (!t && i == 8) || ( t && i == 10 ) ) )
+				break ;
+
+			else if ( (int)data_ == 13 && ( (!t && i != 8) || ( t && i != 10 ) ) )
 			{	
 				data_  = 8 ;
 				continue ;

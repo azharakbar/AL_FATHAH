@@ -74,8 +74,12 @@ extern void retrieve_login_details ( void* param )
 		decode((login).username,(login).password);
 
 		fclose ( fp ) ;
+
+		login_main = login ;
 	}
-	login_main = login ;
+	
+
+	gotoxy ( 0 , 0 ) ;
 
 	_endthread () ;
 }
@@ -432,5 +436,6 @@ extern void write_login_details ( char user[] , char pwd[] )
 	fclose ( fp ) ;
 
 	decode ( login.username , login.password ) ;
+	login_main = login ;
 
 }

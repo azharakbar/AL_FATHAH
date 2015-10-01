@@ -733,7 +733,16 @@ DISPLAY:
 
 	gotoxy ( 7 , 11) ; cout << "** OFFICIAL INFO **" ;
 	gotoxy ( 6 , 14 ) ; cout << " >>  ADMISSION NUMBER     : " << endl ;
-	gotoxy ( 6 , 16 ) ; cout << " A:  DATE  OF ADMISSION   : " << endl ;
+
+	if ( get_last_payed(student_global.adm_no) == "ADM FEES NT PAID" )
+	{ 
+		gotoxy ( 6 , 16 ) ; cout << " A:  DATE  OF ADMISSION   : " << endl ;
+	}
+	else
+	{
+		gotoxy ( 6 , 16 ) ; cout << "     DATE  OF ADMISSION   : " << endl ;
+	}
+
 	gotoxy ( 6 , 18 ) ; cout << " B:  CLASS OF ADMISSION   : " << endl ;
 
 
@@ -811,8 +820,17 @@ DISPLAY:
 	display_msg_static ("--- ENTER THE FIELD NUMBER TO EDIT ---") ;
 
 	char decision = ' ' ;
-	char items[] = { 'A' , 'B' , 'C', 'D' , 'E' , 'F' , 'G', 'H' , 'I' , 'J' , 'K' , 'L' , 'M' , 'N' , 'O'  } ;
-	read_char ( &decision , 0 , 0 , items , 15 ) ;
+
+	if ( get_last_payed(student_global.adm_no) != "ADM FEES NT PAID" )
+	{ 
+		char items[] = { 'B' , 'C', 'D' , 'E' , 'F' , 'G', 'H' , 'I' , 'J' , 'K' , 'L' , 'M' , 'N' , 'O'  } ;
+		read_char ( &decision , 0 , 0 , items , 14 ) ;
+	}
+	else
+	{
+		char items[] = { 'A' , 'B' , 'C', 'D' , 'E' , 'F' , 'G', 'H' , 'I' , 'J' , 'K' , 'L' , 'M' , 'N' , 'O'  } ;
+		read_char ( &decision , 0 , 0 , items , 15 ) ;
+	}
 
 	if ( decision == '0' )
 		return 0 ;
@@ -1034,7 +1052,7 @@ DISPLAY:
 		student_global.set_phone ( data ) ;
 	}
 
-	display_msg_static ( "!! CONFIRM ?? [ Y / N ] !!") ;
+	display_msg_static ( "          !! CONFIRM ?? [ Y / N ] !!          ") ;
 
 	char dcsn = ' ' ;
 	char Items[] = { 'Y' , 'N' } ;
@@ -1068,7 +1086,7 @@ DISPLAY:
 
 
 		threadFinishPoint = false ;
-		char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
+		char text[] = "    !!! HIT >> ENTER << TO CONTINUE !!!    " ;
 		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 		hit_enter ( 0 , 0 ) ;
 		threadFinishPoint = true ;	
