@@ -146,10 +146,9 @@ int main ()
 	}
 
 NOW :
-			
-	startup_tasks ( NULL ) ;		// delete this line when invalidating the NOW label
+	logged_in = true ;			
 
-	logged_in = true ;	
+	startup_tasks ( NULL ) ;		// delete this line when invalidating the NOW label
 
 	int pos = 0 ;
 	
@@ -163,10 +162,10 @@ NOW :
 				student_central_control ( student_menu () ) ;
 				break ;
 			case 2:
-				fee_central_control ( fee_menu () ) ;
+				fee_central_control  	( fee_menu () ) ;
 				break ;
 			case 3:
-				admin_central_control ( admin_menu () ) ;
+				admin_central_control 	( admin_menu () ) ;
 				break ;
 			case 4:
 				gotoxy ( 0 , 0 ); cout << "option 4" ;

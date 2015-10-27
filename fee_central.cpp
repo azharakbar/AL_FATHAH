@@ -411,13 +411,6 @@ START_FEE_PAY:
 		}
 		else
 		{
-/*			if (lp)
-				general_tasks ( "get_lp_fee" , &total) ;
-			else
-				general_tasks ( "get_up_fee" , &total) ;
-
-			total = total * ( no+ 1 ) ;*/
-
 			general_tasks ( "get_adm_fee" , &total ) ;
 
 		}
@@ -444,14 +437,6 @@ START_FEE_PAY:
 				val = ( val*10 ) + ( f.special_encode[k] - 48 ) ;
 
 			total += val ;
-
-/*			val = 0 ;
-
-			for ( ++k ; f.special_encode[k] != '\0' ; ++k )
-				val = ( val*10 ) + ( f.special_encode[k] - 48 ) ;
-
-			total = total + ( val * ( no + 1 ) ) ;*/
-
 		}		
 	}
 
@@ -640,9 +625,6 @@ void view_fee_stats ()
 	gotoxy(58,19); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	general_tasks ( "get_collexn_month" , &val ) ;
 	gotoxy(58,20); cout<<(char)186<<"   >> FEE COLLECTED THIS MONTH"<<setw(15)<< val <<"    "<<(char)186<<endl;
-/*	gotoxy(58,22); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-	gotoxy(58,24); cout<<(char)186<<"                                                 "<<(char)186<<endl;*/
 	gotoxy(58,21); cout<<(char)219<<"                                                 "<<(char)219<<endl;
 	gotoxy(58,22);
 	for(i=0;i<51;++i)
@@ -671,4 +653,33 @@ extern string get_last_payed ( int admno )
 	string last = f.last_payd ;
 	if ( !strcmp ( f.last_payd , "0" ) ) last = "ADM FEES NT PAID" ;
 	return last ;
+}
+
+extern void change_date_admitted ( int admno , string data ) 
+{
+		fee_details x ;
+		int y = 1 ;
+
+		fstream oldfile ;
+		fstream newfile ;
+		oldfile.open ( "fee_db.bin" , ios::in | ios::binary ) ;
+		newfile.open ( "temp.bin" , ios::out | ios::binary ) ;
+
+		while ( y < next_admno )
+		{
+			oldfile.read (( char* ) &x , sizeof(fee_details) ) ;
+			if ( x.admno == admno )
+			{
+				char temp[50] = "" ;
+				convert ( data , temp ) ;
+				x.set_date ( temp ) ;
+			}
+			newfile.write (( char* ) &x , sizeof ( fee_details ) ) ;
+			++y ;
+		}
+		oldfile.close() ;
+		newfile.close() ;
+
+		remove ( "fee_db.bin" );
+		system ( "rename temp.bin fee_db.bin" );	
 }

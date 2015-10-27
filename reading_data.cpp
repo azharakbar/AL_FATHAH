@@ -9,7 +9,7 @@ using namespace std ;
 
 extern void gotoxy ( int , int ) ;
 extern void read_data ( char data[] , int x , int y , int max_size , int special ) ;
-extern void read_data ( string* data , int x , int y , int max_size , int number ) ;
+extern void read_data ( string* data , int x , int y , int max_size , int number , int skip = 0 ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number ) ;
 extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
@@ -84,8 +84,6 @@ extern void read_data ( char data[] , int x , int y , int max_size , int special
 			
 		}
 		data[i] = '\0';
-
-
 }
 
 extern void read_date ( string* d , int x , int y , int max_size , int today ) 
@@ -260,7 +258,7 @@ int date_validation ( string data , int i , char ch )
 	return 1 ;
 }
 
-extern void read_data ( string* d , int x , int y , int max_size , int number ) 
+extern void read_data ( string* d , int x , int y , int max_size , int number , int skip ) 
 {
 		int i = 0 ;
 		
@@ -279,6 +277,15 @@ extern void read_data ( string* d , int x , int y , int max_size , int number )
 			{	
 				data_  = 8 ;
 				continue ;
+			}
+
+			if ( !i && (int)data_ == 9 && skip )
+			{
+				*d = "-2" ;
+				gotoxy ( x , y ) ;
+				for ( int j = 0 ; j <= i ; ++j )
+					printf(" ") ;
+				return ;				
 			}
 
 			if ( (int)data_ == 27 )
@@ -381,7 +388,6 @@ extern void read_char ( char* d , int x , int y , char items[] , int size )
 
 			
 		}
-		//*d = data ;
 	
 }
 
@@ -588,21 +594,8 @@ extern void read_data_continuous ( string* d , int x , int y , int max_size , in
 				else
 						read_ctr = 0 ;
 				return ;
-			}		
-		
-/*			if ( read_ctr >= 0 && (int)data_ != 13 ) 
-			{
-				gotoxy ( x , y ) ;
-				 for ( int j=0 ; j<read_ctr ; ++j)
-				 {
-				 		gotoxy ( 0 , 1+j ) ;
-				 		cout << " j = " << j << " data[j] = " << data[j] << endl ;
-				 		gotoxy ( x+j , y ) ;
-						printf("%c",data[j]);
-				 }
-			}*/
+			}
 			
-		
 		data[read_ctr] = '\0';
 
 	if ( n != NULL )

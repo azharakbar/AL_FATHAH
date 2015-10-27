@@ -156,8 +156,7 @@ extern int admin_menu ()
 	gotoxy(58,23); cout<<(char)186<<"                                                 "<<(char)186<<endl;
 	gotoxy(58,24); cout<<(char)186<<"     4.  MAIN MENU                               "<<(char)186<<endl;
 	gotoxy(58,25); cout<<(char)186<<"                                                 "<<(char)186<<endl;
-/*	gotoxy(58,26); cout<<(char)186<<"     5.  EXIT                                    "<<(char)186<<endl;
-	gotoxy(58,27); cout<<(char)219<<"                                                 "<<(char)219<<endl;*/
+
 	gotoxy(58,26);
 	for(i=0;i<51;++i)
 		cout<<(char)223;

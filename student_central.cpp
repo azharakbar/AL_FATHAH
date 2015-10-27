@@ -14,10 +14,11 @@ extern void gotoxy ( int , int ) ;
 extern void header () ;
 extern int get_next_adm_no () ;
 extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
-extern void read_data ( string* data , int x , int y , int max_size , int number ) ;
+extern void read_data ( string* data , int x , int y , int max_size , int number , int skip = 0 ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
+extern void change_date_admitted ( int , string ) ;
 extern void hit_enter ( int x , int y ) ;
 extern int  find_age  ( string data ) ;
 extern void fee_student_init ( int admno , char [] , char[] ) ;
@@ -380,6 +381,8 @@ START:
 
 	s.set_admno ( next_admno ) ;
 
+	string rltn_list[] = { "FATHER" , "MOTHER" , "BROTHER" , "SISTER" , "UNCLE" , "AUNTY" , "OTHER" } ;
+
 READ_DATE_ADMITTED :
 	data = "" ;
 	read_date ( &data , 35 , 16 , 10 , 1 ) ;
@@ -410,6 +413,7 @@ READ_STUDENT_NAME:
 		printf ( "  " ) ;		
 		goto READ_CLASS;
 	}
+
 	s.set_student_name ( data ) ;
 
 READ_STUDENT_GENDER:
@@ -422,6 +426,10 @@ READ_STUDENT_GENDER:
 		printf ( "                                                      " ) ;			
 		goto READ_STUDENT_NAME;		
 	}
+
+	else if ( data == "-2" )
+		goto READ_DOB ;
+
 	s.set_student_gender ( data ) ;
 
 READ_DOB:
@@ -433,13 +441,17 @@ READ_DOB:
 		printf ( "       " ) ;			
 		goto READ_STUDENT_GENDER;		
 	}
+
+	else if ( data == "-2" )
+		goto READ_SKUL ;
+
 	s.set_dob ( data ) ;
 	s.set_age ( find_age ( data ) ) ;
 	gotoxy ( 35 , 31 ) ; cout << find_age ( data ) << endl ;
 
 READ_SKUL:
 	data = "" ;
-	read_data ( &data , 35 , 33 , 32 , 0 ) ;
+	read_data ( &data , 35 , 33 , 32 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 29 ) ;
@@ -448,44 +460,60 @@ READ_SKUL:
 		printf ( "  " ) ;						
 		goto READ_DOB ;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_FATHER_NAME ;
+
 	s.set_skul_name ( data ) ;
 
 READ_FATHER_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 40 , 52 , 0 ) ;
+	read_data ( &data , 35 , 40 , 52 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 33 ) ;
 		printf ( "                                  " ) ;			
 		goto READ_SKUL;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_MOTHER_NAME ;
+
 	s.set_father_name ( data ) ;
 
 READ_MOTHER_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 42 , 52 , 0 ) ;
+	read_data ( &data , 35 , 42 , 52 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 40 ) ;
 		printf ( "                                            " ) ;			
 		goto READ_FATHER_NAME;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_GUARD_NAME ;
+
 	s.set_mother_name ( data ) ;		
 
 READ_GUARD_NAME:
 	data = "" ;
-	read_data ( &data , 35 , 44 , 52 , 0 ) ;
+	read_data ( &data , 35 , 44 , 52 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 42 ) ;
 		printf ( "                                            " ) ;			
 		goto READ_MOTHER_NAME;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_ADDR_HNAME ;
+
 	s.set_guard_name ( data ) ;	
 
 READ_GUARD_RLTN:
 	data = "" ;
-	string rltn_list[] = { "FATHER" , "MOTHER" , "BROTHER" , "SISTER" , "UNCLE" , "AUNTY" , "OTHER" } ;
+	
 	read_list ( &data , 35 , 46 , rltn_list , 7 ) 	;
 	if ( data == "-1" )
 	{
@@ -493,66 +521,90 @@ READ_GUARD_RLTN:
 		printf ( "                                             " ) ;			
 		goto READ_GUARD_NAME;		
 	}
+
+	else if ( data == "-2" )
+		goto READ_ADDR_HNAME ;
+
 	s.set_student_relation ( data ) ;	
 
 READ_ADDR_HNAME:
 	data = "" ;
-	read_data ( &data , 124 , 14 , 32 , 0 ) ;
+	read_data ( &data , 124 , 14 , 32 , 0 , 1  ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 46 ) ;
 		printf ( "         " ) ;			
 		goto READ_GUARD_RLTN;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_ADDR_PLACE ;
+
 	s.set_addr_hname( data ) ;
 
 READ_ADDR_PLACE:
 	data = "" ;
-	read_data ( &data , 124 , 16 , 22 , 0 ) ;
+	read_data ( &data , 124 , 16 , 22 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 124 , 14 ) ;
 		printf ( "                              " ) ;			
 		goto READ_ADDR_HNAME;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_ADDR_POST ;
+
 	s.set_addr_place ( data ) ;
 
 READ_ADDR_POST:
 	data = "" ;
-	read_data ( &data , 124 , 18 , 22 , 0 ) ;
+	read_data ( &data , 124 , 18 , 22 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 124 , 16 ) ;
 		printf ( "                              " ) ;			
 		goto READ_ADDR_PLACE;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_ADDR_PIN ; 
+
 	s.set_addr_post ( data ) ;						
 
 READ_ADDR_PIN:
 	data = "" ;
-	read_data ( &data , 124 , 20 , 8 , 1 ) ;
+	read_data ( &data , 124 , 20 , 8 , 1 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 124 , 18 ) ;
 		printf ( "                              " ) ;			
 		goto READ_ADDR_POST;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_PHONE ;
+
 	s.set_addr_pin ( data ) ;
 
 READ_PHONE:
 	data = "" ;
-	read_data ( &data , 124 , 22 , 13 , 1 ) ;
+	read_data ( &data , 124 , 22 , 13 , 1 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 124 , 20 ) ;
 		printf ( "                  " ) ;
 		goto READ_ADDR_PIN;			
 	}
+
+	else if ( data == "-2" )
+		goto READ_SPECIAL ;
+
 	s.set_phone ( data ) ;
 
 READ_SPECIAL:
 	data = "" ;
-	string list[] = { "YES" , "NO" } ;
+	string list[] = { "NO" , "YES" } ;
 	read_list ( &data , 124 , 29 , list , 2 ) ;
 	if ( data == "-1" )
 	{
@@ -848,7 +900,6 @@ DISPLAY:
 			goto DISPLAY;
 		}
 		student_global.set_date_admitted ( data ) ;		
-		
 	}
 	else if ( decision == 'B' || decision == 'b' ) 
 	{
@@ -1084,6 +1135,10 @@ DISPLAY:
 		remove ( "stud_db.bin" );
 		system ( "rename temp.bin stud_db.bin" );
 
+		if ( decision == 'a' || decision == 'A' )
+		{
+			change_date_admitted ( student_global.adm_no , data ) ;
+		}
 
 		threadFinishPoint = false ;
 		char text[] = "    !!! HIT >> ENTER << TO CONTINUE !!!    " ;
@@ -1334,19 +1389,17 @@ START:
 	gotoxy ( 125 ,14 ) ;
 	cout << "FEE LAST PAYED" << endl ;
 
-
+	int pos_index = 1 ;
 	while ( y < next_admno )
 	{	
 		file.read ( ( char* )&s , sizeof (student_data) ) ;
-		s.list_details_display ( (y-1)*2 ) ;
+		s.list_details_display ( (pos_index-1)*2 ) ;
+		++pos_index ;
 		++y ;
 		if ( y % 16 == 0  && y < next_admno ) 
 		{
-			threadFinishPoint = false ;
-			char text[] = "!!! HIT >> ENTER << TO VIEW MORE !!!" ;
-			h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
+			display_msg_static ( "!!! HIT >> ENTER << TO VIEW MORE !!!") ;
 			hit_enter ( 0 , 0 ) ;
-			threadFinishPoint = true ;	
 
 			goto START ;
 		}

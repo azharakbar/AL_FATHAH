@@ -7,7 +7,6 @@ using namespace std ;
 
 extern int menu_control ( int , int , int , int esc = 0 ) ;
 extern void gotoxy ( int , int ) ;
-//extern void student_central_control ( int );
 
 extern int menu_control ( int  x , int start_y , int end_y , int esc )
 {

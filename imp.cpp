@@ -184,7 +184,8 @@ extern void display_time ( void* params )
 		file.open ( "date.txt" , ios::in );
 		file.getline ( temp_date , 20 ) ;
 		file.close () ;
-
+		
+		
 		if ( !strcmp ( sdate , "" ) )
 		{
 			strcpy ( sdate , temp_date ) ;
@@ -480,15 +481,14 @@ extern void startup_tasks ( void* params )
 
 	if ( fp == NULL )
 	{
-		fclose ( fp ) ;
+		fclose ( fp ) ;	
 		g.day = grab_date ( sdate , "day" ) ;
 		g.month = grab_date ( sdate , "month" ) ;
 		g.set_fee_day ( 0 ) ;
-		g.set_fee_month ( 0 ) ;
-		cout << "set to : " << g.day << "   " << g.month << endl ;		
+		g.set_fee_month ( 0 ) ;	
 		fp = fopen ( "gen_db.bin" , "wb+" ) ;
 		fwrite ( &g , sizeof ( general ) , 1 , fp ) ;
-		fclose ( fp ) ;
+		fclose ( fp ) ;	
 	}
 	else
 	{
