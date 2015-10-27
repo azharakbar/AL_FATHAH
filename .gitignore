@@ -16,3 +16,5 @@ time.txt
 try.cpp
 compile.cpp
 gen_db.bin
+fee_db.bin
+fee_stats.txt
