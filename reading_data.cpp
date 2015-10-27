@@ -11,7 +11,7 @@ extern void gotoxy ( int , int ) ;
 extern void read_data ( char data[] , int x , int y , int max_size , int special ) ;
 extern void read_data ( string* data , int x , int y , int max_size , int number , int skip = 0 ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number ) ;
-extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
+extern void read_date ( string* data , int x , int y , int max_size , int today ,int skip ) ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void read_list ( string* data , int x , int y , string list[] , int size ) ;
 extern void read_vector ( string* data , int x , int y , vector<string> list , int* pos ) ;
@@ -86,7 +86,7 @@ extern void read_data ( char data[] , int x , int y , int max_size , int special
 		data[i] = '\0';
 }
 
-extern void read_date ( string* d , int x , int y , int max_size , int today ) 
+extern void read_date ( string* d , int x , int y , int max_size , int today , int skip ) 
 {
 		int i = 0 , t =  0 ;
 		
@@ -111,6 +111,15 @@ extern void read_date ( string* d , int x , int y , int max_size , int today )
 				continue ;
 			}
 
+			if ( !i && (int)data_ == 9 && skip )
+			{
+				*d = "-2" ;
+				gotoxy ( x , y ) ;
+				for ( int j = 0 ; j <= i ; ++j )
+					printf(" ") ;
+				return ;				
+			}
+			
 			if ( (int)data_ == 27 )
 			{
 				*d = "-1" ;

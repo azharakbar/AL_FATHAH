@@ -13,7 +13,7 @@ class student_data ;
 extern void gotoxy ( int , int ) ;
 extern void header () ;
 extern int get_next_adm_no () ;
-extern void read_date ( string* data , int x , int y , int max_size , int today ) ;
+extern void read_date ( string* data , int x , int y , int max_size , int today , int skip ) ;
 extern void read_data ( string* data , int x , int y , int max_size , int number , int skip = 0 ) ;
 extern void read_data_continuous ( string* d , int x , int y , int max_size , int number , int* n = NULL )  ;
 extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
@@ -201,7 +201,10 @@ public:
 			gotoxy ( 35 , 25 ) ; cout << student_name << endl ;
 			gotoxy ( 35 , 27 ) ; cout << gender << endl ;
 			gotoxy ( 35 , 29 ) ; cout << dob << endl ;
-			gotoxy ( 35 , 31 ) ; cout << grab_date ( sdate , "year" ) - grab_date ( dob , "year" ) << endl ;			
+			if ( strcmp ( dob , "NT ASSIGNED") )
+				{gotoxy ( 35 , 31 ) ; cout << grab_date ( sdate , "year" ) - grab_date ( dob , "year" ) << endl ;}			
+			else
+				{gotoxy ( 35 , 31 ) ; cout << 0 << endl ;}			
 			gotoxy ( 35 , 33 ) ; cout << skul_name << endl ;
 			gotoxy ( 35 , 40 ) ; cout << father_name << endl ;
 			gotoxy ( 35 , 42 ) ; cout << mother_name << endl ;
@@ -385,7 +388,7 @@ START:
 
 READ_DATE_ADMITTED :
 	data = "" ;
-	read_date ( &data , 35 , 16 , 10 , 1 ) ;
+	read_date ( &data , 35 , 16 , 10 , 1 , 1 ) ;
 	if ( data == "-1" )
 	{
 		return 0 ;
@@ -434,16 +437,18 @@ READ_STUDENT_GENDER:
 
 READ_DOB:
 	data = "" ;
-	read_date ( &data , 35 , 29 , 10 , 0 ) ;
+	read_date ( &data , 35 , 29 , 10 , 0 , 1 ) ;
 	if ( data == "-1" )
 	{
 		gotoxy ( 35 , 27 ) ;
 		printf ( "       " ) ;			
 		goto READ_STUDENT_GENDER;		
 	}
-
 	else if ( data == "-2" )
+	{
+		s.set_age ( find_age ( sdate ) ) ;
 		goto READ_SKUL ;
+	}
 
 	s.set_dob ( data ) ;
 	s.set_age ( find_age ( data ) ) ;
@@ -892,7 +897,7 @@ DISPLAY:
 		gotoxy ( 35 , 16 ) ;
 		printf("          ") ;
 		data = "" ;
-		read_date ( &data , 35 , 16 , 10 , 1 ) ;
+		read_date ( &data , 35 , 16 , 10 , 1 , 0 ) ;
 		if ( data == "-1" )
 		{
 			gotoxy ( 35 , 16 ) ;
@@ -950,7 +955,7 @@ DISPLAY:
 		gotoxy ( 35 , 29 ) ;
 		printf("          ") ;
 		data = "" ;
-		read_date ( &data , 35 , 29 , 10 , 0 ) ;
+		read_date ( &data , 35 , 29 , 10 , 0 , 0 ) ;
 		if ( data == "-1" )
 		{
 			gotoxy ( 35 , 29 ) ;
