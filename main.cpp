@@ -23,6 +23,8 @@ extern void draw_banner_line ( void* params ) ;
 extern void exit_screen () ;
 extern void read_data ( char data[] , int x , int y , int max_size , int special ) ;
 
+extern void display_news_roll ( void* params ) ;
+
 extern bool threadFinishPoint = false ;
 extern bool logged_in = false ;
 
@@ -35,8 +37,6 @@ extern int fee_menu () ;
 extern void fee_central_control ( int ) ;
 extern int admin_menu () ;
 extern void admin_central_control ( int ) ;
-
-extern void news_roll ( void* ) ;
 
 struct msg_list_main
 {
@@ -149,6 +149,8 @@ NOW :
 	logged_in = true ;			
 
 	startup_tasks ( NULL ) ;		// delete this line when invalidating the NOW label
+
+	_beginthread ( display_news_roll , 0 , NULL ) ;
 
 	int pos = 0 ;
 	

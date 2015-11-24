@@ -11,10 +11,6 @@ extern int grab_date ( char [] , char [] ) ;
 extern char sdate[20] = "" ;
 extern char stime[20] = "" ;
 
-struct news_feed
-{
-	string headline ;
-}news;
 
 struct fees
 {
@@ -25,12 +21,13 @@ struct fees
 
 class general
 {
-	fees fee_struct ;
-	int total_enrolled ;
-	int fee_day ;
-	int fee_month ;
+
 
 	public:
+		fees fee_struct ;
+		int total_enrolled ;
+		int fee_day ;
+		int fee_month ;		
 		int day ;
 		int month ;		
 		void set_adm_fee ( int d )
@@ -56,6 +53,10 @@ class general
 		int get_up_fee ()
 		{
 			return fee_struct.up_fee ;
+		}
+		void init_tot_enrol ( int d )
+		{
+			total_enrolled = d - 1 ;						
 		}
 		void set_tot_enrol ( )		
 		{
@@ -128,18 +129,21 @@ extern string next_month ( int , int ) ;
 extern void generate_avail_list ( char start[] , char end[] ) ;
 extern int calc_date_diff ( char start[] , char end[] ) ;
 extern void lexi_sort ( char words[][50] , int n  ) ;
-extern void set_news ( string news , int id ) ;
-extern void news_roll ( void* ) ;
 
 char pause[20] = "no" ;
 extern bool logged_in ;
-extern bool news_control = true ;
+extern bool newsPause ;
+
+
+extern void init_news_roll () ;
+extern void display_news_roll ( void* params ) ;
 
 extern void startup_tasks ( void* ) ;
 extern int get_next_adm_no () ;
 extern int next_admno = 0 ;
 
 extern int general_tasks ( string , int* data = 0 ) ;
+extern int get_fee_default () ;
 
 extern void gotoxy (int x, int y)
 {
@@ -443,6 +447,8 @@ extern void generate_avail_list ( char start[] , char end[] , vector<string>& li
 
 extern void startup_tasks ( void* params ) 
 {
+
+
 	FILE* fp ;
 
 	fp = fopen ( "stud_db.bin" , "r" ) ;
@@ -456,6 +462,8 @@ extern void startup_tasks ( void* params )
 	fclose ( fp ) ;
 
 	next_admno = get_next_adm_no () ;
+
+					g.init_tot_enrol ( next_admno ) ;	
 
 	fp = fopen ( "fee_db.bin" , "r" ) ;
 
@@ -528,7 +536,7 @@ extern void startup_tasks ( void* params )
 		}					
 	}		
 
-
+		init_news_roll () ;
 }
 
 extern int general_tasks ( string type , int* data ) 
@@ -548,6 +556,10 @@ extern int general_tasks ( string type , int* data )
 	else if ( type == "get_up_fee" )
 	{
 		*data += g.get_up_fee () ;
+	}	
+	else if ( type == "get_fee_default")
+	{
+		*data = get_fee_default () ;
 	}	
 	else if ( type == "set_enroll")
 	{
@@ -629,6 +641,7 @@ extern int calc_date_diff ( char start[] , char end[] )
 extern void header ()
 {
 	strcpy ( pause , "yes" ) ;
+	newsPause = true ;
 	system ( "cls" ) ;
 	gotoxy ( 3 , 7 ) ;  cout << sdate << endl ;
 	gotoxy ( 158 , 7 ) ; cout << stime << endl ;
@@ -648,11 +661,13 @@ extern void header ()
 
 	draw_msg_box_static() ;
 	strcpy ( pause , "" ) ;
+	newsPause = false ;
 }
 
 extern void exit_screen()
 {
 	strcpy ( pause , "yes" ) ;
+	newsPause = true ;
 	int i=0;
 	system("cls");
 	for(i=0;i<=18;++i)
@@ -712,9 +727,4 @@ extern void lexi_sort ( char words[][50] , int n )
 
 
 	}	
-}
-
-extern void set_news ( string new_news , int id )
-{
-	news.headline = new_news ;
 }

@@ -30,16 +30,18 @@ extern string get_student_class ( int admno ) ;
 extern string get_last_payed ( int admno ) ;
 extern void display_msg_static ( string ) ;
 extern void hit_enter ( int x , int y ) ;
-extern void set_news ( string news , int id ) ;
 
 extern int  show_student_data_brief ( int admno , int* lp ) ;
 extern fee_details show_fee_data_brief ( int admno , int* status ) ;
+extern int get_fee_default () ;
 
 extern int grab_date ( char [] , char [] ) ;
 extern string convert_month ( int id ) ;
 extern void generate_avail_list ( char start[] , char end[] , vector<string>& list ) ;
 extern void blink_text ( void* text ) ;
-extern bool news_control ;
+
+extern void update_news_roll ( int d ) ;
+
 
 int  fee_pay () ;
 int  view_fee_defaulters () ;
@@ -49,6 +51,7 @@ extern int read_ctr ;
 extern int next_admno ;
 extern char sdate[20]  ;
 extern bool threadFinishPoint ;
+extern bool newsPause ;
 
 class fee_details
 {
@@ -302,6 +305,9 @@ int fee_pay ()
 
 START_FEE_PAY:
 	header();
+
+	newsPause = true ;
+
 	gotoxy(78 , 8) ;
 	cout<<"FEE PAYMENT"<<endl;
 	gotoxy(77,9);
@@ -457,9 +463,13 @@ START_FEE_PAY:
 		strcpy  ( fee_global.last_payd , d ) ;
 		fee_global.set_to_pay ( fee_global.last_payd ) ;
 		general_tasks ( "set_fee_collexn" , &total ) ;
+		update_news_roll ( 3 ) ;
+		update_news_roll ( 4 ) ;
 		return adm ;
 	}
 	else goto START_FEE_PAY ;
+
+	newsPause = false ;
 
 	return 0 ;
 }
@@ -518,6 +528,9 @@ int view_fee_defaulters ()
 
 START :
 	header();
+
+	newsPause = true ;
+
 	gotoxy(76 , 8) ;
 	cout<<"FEE DEFAULTERS"<<endl;
 	gotoxy(75,9);
@@ -564,13 +577,13 @@ START :
 
 		++y ;
 
-		if ( y % 16 == 0  && y < next_admno ) 
+		if ( no % 16 == 0  && no < next_admno ) 
 		{
 			threadFinishPoint = false ;
 			char text[] = "!!! HIT >> ENTER << TO VIEW MORE !!!" ;
 			h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 			hit_enter ( 0 , 0 ) ;
-			threadFinishPoint = true ;			
+			threadFinishPoint = true ;
 			goto START ;
 		}		
 	}
@@ -599,6 +612,8 @@ START :
 
 	file.close () ;
 
+	newsPause = true ;
+
 	return 0 ;
 }
 
@@ -608,6 +623,9 @@ void view_fee_stats ()
 	HANDLE h ;
 
 	header();
+
+	newsPause = true ;
+
 	gotoxy( 74 , 13 ) ;
 	cout<<"FEE COLLECTION STATS"<<endl;
 	gotoxy( 73,  14 );
@@ -645,6 +663,8 @@ void view_fee_stats ()
 	}
 	
 	threadFinishPoint = true ;	
+
+	newsPause = true ;
 }
 
 extern string get_last_payed ( int admno ) 
@@ -682,4 +702,21 @@ extern void change_date_admitted ( int admno , string data )
 
 		remove ( "fee_db.bin" );
 		system ( "rename temp.bin fee_db.bin" );	
+}
+
+extern int get_fee_default ()
+{
+	int y = 1 , no = 0 ;
+	fstream file ;
+	fee_details x ;
+
+	while ( y < next_admno )
+	{
+		file.read((char*)&x , sizeof(fee_details)) ;
+
+		if ( (grab_date ( x.to_pay , "year" ) < grab_date ( sdate , "year" )) || ( grab_date ( x.to_pay , "year" ) == grab_date ( sdate , "year" ) ) && ( grab_date ( x.to_pay , "month" ) <= grab_date ( sdate , "month" )  )  )
+			++no;
+		++y ;
+	}	
+	return no ;
 }

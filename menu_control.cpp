@@ -8,6 +8,8 @@ using namespace std ;
 extern int menu_control ( int , int , int , int esc = 0 ) ;
 extern void gotoxy ( int , int ) ;
 
+extern bool newsPause ;
+
 extern int menu_control ( int  x , int start_y , int end_y , int esc )
 {
 
@@ -23,7 +25,9 @@ extern int menu_control ( int  x , int start_y , int end_y , int esc )
 	while ( a != "13" )
 	{
 		gotoxy ( x , start_y + pos ) ;
+		newsPause = true ;
 		cout << " >> " ;
+		newsPause = false ;
 
 		b = 1 ;
 		while ( b )

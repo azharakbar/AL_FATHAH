@@ -21,11 +21,10 @@ extern void read_char ( char* d , int x , int y , char items[] , int size ) ;
 extern void display_msg_static ( string msg )  ;
 extern void hit_enter ( int x , int y ) ;
 extern void blink_text ( void* text ) ;
-extern void set_news ( string news , int id ) ;
 
 extern void admin_central_control ( int ) ;
 extern bool threadFinishPoint ;
-extern bool news_control ;
+extern bool newsPause ;
 
 extern char sdate[20] ;
 extern char stime[20] ;
@@ -63,6 +62,7 @@ int change_fee_structure ()
 	HANDLE h ;
 
 	header();
+	newsPause = true ;
 	gotoxy(74 , 8) ;
 	cout<<"CHANGE FEE STRUCTURE"<<endl;
 	gotoxy(73,9);
@@ -95,8 +95,9 @@ int change_fee_structure ()
 	gotoxy ( 64 , 21 ) ; cout << "     UPPER PRIMARY FEES   : " << setw(7) << d3 << endl ;
 
 	int pos = menu_control ( 65 , 17 , 21 , 1 ) ;
+	newsPause = true ;
 
-	if ( pos == -1 ) return 0 ;
+	if ( pos == -1 ) { 	newsPause = false ; return 0 ; }
 
 	pos = (pos+2)/2 ;	
 
@@ -141,6 +142,7 @@ int change_fee_structure ()
 		read_data_continuous ( &data , 96 , 28 , 8 , 1 , &fees ) ;
 		if ( data == "-1" )
 		{
+				newsPause = false ;
 			return 0 ;
 		}
 	}
@@ -169,10 +171,12 @@ int change_fee_structure ()
 		char text[] = "!!!===== FEE STRUCTURE UPDATED =====!!!" ;
 		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 		hit_enter ( 0 , 0 ) ;
-		threadFinishPoint = true ;				
+		threadFinishPoint = true ;	
+		newsPause = false ;			
 		return 1 ;
 	}	
 
+	newsPause = false ;
 	return 0 ;
 
 }
@@ -184,6 +188,7 @@ int change_login_credits ()
 	HANDLE h ;
 
 	header();
+	newsPause = true ;
 	gotoxy(72 , 8) ;
 	cout<<"CHANGE LOGIN CREDENTIALS"<<endl;
 	gotoxy(71,9);
@@ -214,7 +219,7 @@ int change_login_credits ()
 
 	read_data ( username , 87 , 17 , 20 , 0 ) ;	
 
-	if ( !strcmp ( username , "-1" ) ) return 0 ;
+	if ( !strcmp ( username , "-1" ) ) { 	newsPause = false ; return 0 ; }
 
 	read_data ( password , 87 , 19 , 20 , 1 ) ;
 
@@ -245,6 +250,7 @@ int change_login_credits ()
 	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 	hit_enter ( 0 , 0 ) ;
 	threadFinishPoint = true ;		
+		newsPause = false ;
 
 	return 0 ;
 }
@@ -292,9 +298,11 @@ void create_backup ()
 	strcpy ( text , "!!! << BACKUP CREATED SUCCESSFULLY >> !!!") ;
 
 	remove ( "t.txt" ) ;
+	newsPause = true ;
 	threadFinishPoint = false ;
 	HANDLE h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 	hit_enter ( 0 , 0 ) ;
 	threadFinishPoint = true ;		
+	newsPause = false ;
 
 }

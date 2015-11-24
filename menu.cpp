@@ -12,11 +12,16 @@ extern void gotoxy ( int , int ) ;
 extern void header () ;
 extern int  menu_control ( int , int , int , int esc = 0 ) ;
 
+extern bool newsPause ;
+
 extern int main_menu ()
 {
 	int i=0;
 
 	header();
+
+	newsPause = true ;
+
 	gotoxy(0,0);cout<<endl;
 	gotoxy(79 , 13) ;
 	cout<<"MAIN MENU"<<endl;
@@ -43,6 +48,8 @@ extern int main_menu ()
 		cout<<(char)223;
 	cout<<endl;	
 
+	newsPause = false ;
+
 	int pos = menu_control ( 60 , 18 , 26 ) ;
 
 	pos = (pos+2)/2 ;
@@ -57,6 +64,9 @@ extern int student_menu ()
 	int i=0;
 
 	header();
+
+	newsPause = true ;
+
 	gotoxy(72 , 13) ;
 	cout<<"STUDENT DATABASE CENTRAL"<<endl;
 	gotoxy(71,14);
@@ -84,6 +94,8 @@ extern int student_menu ()
 		cout<<(char)223;
 	cout<<endl;	
 	
+	newsPause = false ;
+
 	int pos = menu_control ( 60 , 18 , 26 ) ;
 
 	pos = ( pos + 2 ) / 2 ;
@@ -99,6 +111,9 @@ extern int fee_menu ()
 	int i=0;
 
 	header();
+
+	newsPause = true ;
+
 	gotoxy(73 , 13) ;
 	cout<<"FEE COLLECTION CENTRAL"<<endl;
 	gotoxy(72,14);
@@ -123,6 +138,8 @@ extern int fee_menu ()
 	for(i=0;i<51;++i)
 		cout<<(char)223;
 	cout<<endl;	
+
+	newsPause = false ;
 	
 	int pos = menu_control ( 60 , 18 , 24 ) ;
 
@@ -137,6 +154,9 @@ extern int admin_menu ()
 	int i=0;
 
 	header();
+
+	newsPause = true ;
+
 	gotoxy(0,0);cout<<endl;
 	gotoxy(79 , 13) ;
 	cout<<"ADMIN MENU"<<endl;
@@ -161,6 +181,8 @@ extern int admin_menu ()
 	for(i=0;i<51;++i)
 		cout<<(char)223;
 	cout<<endl;	
+
+	newsPause = false ;
 
 	int pos = menu_control ( 60 , 18 , 24 ) ;
 

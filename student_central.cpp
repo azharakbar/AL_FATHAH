@@ -31,12 +31,12 @@ extern int menu_control ( int  x , int start_y , int end_y , int esc ) ;
 extern void lexi_sort ( char words[][50] , int n ) ;
 extern void blink_text ( void* text ) ;
 extern int general_tasks ( string , int* data = 0 ) ;
-extern void set_news ( string news , int id ) ;
+extern void update_news_roll ( int d ) ;
 
 extern int show_student_data_brief ( int admno , int *lp ) ;
 
 extern int next_admno ;
-extern bool news_control ;
+extern bool newsPause ;
 
 int new_student_entry () ;
 int edit_student_entry () ;
@@ -261,6 +261,7 @@ int new_student_entry ()
 
 START:
 	header();
+	newsPause = true ;
 	gotoxy(75 , 8) ;
 	cout<<"NEW STUDENT ENTRY"<<endl;
 	gotoxy(74,9);
@@ -391,6 +392,7 @@ READ_DATE_ADMITTED :
 	read_date ( &data , 35 , 16 , 10 , 1 , 1 ) ;
 	if ( data == "-1" )
 	{
+		newsPause = false ;
 		return 0 ;
 	}
 	s.set_date_admitted ( data ) ;
@@ -696,19 +698,21 @@ READ_SPECIAL:
 
 		fee_student_init ( s.get_admno() , s.date_admitted , special_encode ) ;
 		general_tasks ( "set_enroll" ) ;
-
+		update_news_roll ( 1 ) ;
+		update_news_roll ( 3 ) ;
 		threadFinishPoint = false ;
 		char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
 		h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 		hit_enter ( 0 , 0 ) ;
 		threadFinishPoint = true ;	
 		goto START ;
-		
+		newsPause = false ;
 		return 1 ;
 	}
 	else
-		goto START ;
+		goto READ_SPECIAL ;
 
+	newsPause = false ;
 	return  0 ;
 }
 
@@ -721,7 +725,9 @@ int edit_student_entry()
 	HANDLE h ;
 
 START:
+
 	header();
+	newsPause = true ;
 	gotoxy(75 , 8) ;
 	cout<<"EDIT STUDENT ENTRY"<<endl;
 	gotoxy(74,9);
@@ -753,6 +759,7 @@ START:
 		read_data_continuous ( &data , 30 , 11 , 8 , 1 , &adm ) ;
 		if ( data == "-1" )
 		{
+			newsPause = true ;
 			return 0 ;
 		}
 
@@ -764,7 +771,9 @@ START:
 	}
 
 DISPLAY:
+
 	header();
+	newsPause = true ;
 	gotoxy(74 , 8) ;
 	cout<<"SEARCH STUDENT ENTRY"<<endl;
 	gotoxy(73,9);
@@ -890,7 +899,10 @@ DISPLAY:
 	}
 
 	if ( decision == '0' )
+	{
+		newsPause = false ;
 		return 0 ;
+	}
 
 	if ( decision == 'A' || decision == 'a' ) 
 	{
@@ -1157,8 +1169,8 @@ DISPLAY:
 	else
 		goto START ;
 
-
-	return  0 ;
+	newsPause = false ;
+	return  0 ;	
 }
 
 int search_student_entry()
@@ -1171,6 +1183,7 @@ int search_student_entry()
 
 START:
 	header();
+	newsPause = true ;
 	gotoxy(74 , 8) ;
 	cout<<"SEARCH STUDENT ENTRY"<<endl;
 	gotoxy(73,9);
@@ -1202,6 +1215,7 @@ START:
 		read_data_continuous ( &data , 30 , 11 , 8 , 1 , &adm ) ;
 		if ( data == "-1" )
 		{
+			newsPause = false ;
 			return 0 ;
 		}
 
@@ -1213,6 +1227,7 @@ START:
 	}
 
 	header();
+	newsPause = true ;
 	gotoxy(74 , 8) ;
 	cout<<"SEARCH STUDENT ENTRY"<<endl;
 	gotoxy(73,9);
@@ -1318,6 +1333,7 @@ START:
 	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 	hit_enter ( 0 , 0 ) ;
 	threadFinishPoint = true ;	
+	newsPause = false ;
 
 	return  0 ;
 }
@@ -1329,7 +1345,9 @@ int all_student_list ()
 	fstream file ;
 	HANDLE h ;
 
+
 	header();
+	newsPause = true ;
 	gotoxy(76 , 8) ;
 	cout<<"ALL STUDENT LIST"<<endl;
 	gotoxy(75,9);
@@ -1345,7 +1363,7 @@ int all_student_list ()
 	
 	int pos = menu_control ( 11 , 17 , 21 , 1 ) ;
 
-	if ( pos == -1 ) return 0 ;
+	if ( pos == -1 ) { newsPause = false ; return 0 ;}
 
 	pos = ( pos+2 ) / 2 ;
 
@@ -1359,6 +1377,7 @@ int all_student_list ()
 		file.open ( "temp.bin" , ios :: in | ios :: binary ) ;
 START:
 	header();
+	newsPause = true ;
 	gotoxy(76 , 8) ;
 	cout<<"ALL STUDENT LIST"<<endl;
 	gotoxy(75,9);
@@ -1414,10 +1433,12 @@ START:
 	remove ( "temp.bin" ) ;
 
 	threadFinishPoint = false ;
+		
 	char text[] = "!!! HIT >> ENTER << TO CONTINUE !!!" ;
 	h = (HANDLE)_beginthread ( blink_text , 0 , &text ) ;
 	hit_enter ( 0 , 0 ) ;
 	threadFinishPoint = true ;	
+		newsPause = false ;
 
 	return  0 ;
 }
