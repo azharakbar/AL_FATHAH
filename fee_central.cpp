@@ -203,6 +203,9 @@ extern void fee_central_control ( int choice )
 				remove ( "fee_db.bin" );
 				system ( "rename temp.bin fee_db.bin" );
 
+				update_news_roll ( 3 ) ;
+				update_news_roll ( 4 ) ;				
+
 			}
 
 			break ;
@@ -463,8 +466,7 @@ START_FEE_PAY:
 		strcpy  ( fee_global.last_payd , d ) ;
 		fee_global.set_to_pay ( fee_global.last_payd ) ;
 		general_tasks ( "set_fee_collexn" , &total ) ;
-		update_news_roll ( 3 ) ;
-		update_news_roll ( 4 ) ;
+
 		return adm ;
 	}
 	else goto START_FEE_PAY ;
@@ -577,7 +579,7 @@ START :
 
 		++y ;
 
-		if ( no % 16 == 0  && no < next_admno ) 
+		if ( no && no % 16 == 0  && no < next_admno ) 
 		{
 			threadFinishPoint = false ;
 			char text[] = "!!! HIT >> ENTER << TO VIEW MORE !!!" ;
@@ -710,6 +712,7 @@ extern int get_fee_default ()
 	fstream file ;
 	fee_details x ;
 
+	file.open ( "fee_db.bin" , ios::in|ios::binary ) ;
 	while ( y < next_admno )
 	{
 		file.read((char*)&x , sizeof(fee_details)) ;
@@ -718,5 +721,8 @@ extern int get_fee_default ()
 			++no;
 		++y ;
 	}	
+	file.close () ;
+
 	return no ;
 }
+
