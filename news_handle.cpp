@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdio.h>
 #include <conio.h>
+#include <ctime>
 
 using namespace std ;
 
@@ -86,11 +87,32 @@ extern void display_news_roll ( void* params )
 		cout<<endl;
 
 		while ( newsPause ) ;
+    	
+    	srand(time(NULL));
+
+    	int x = (rand() % size ) ;
 
 		for ( int i = 0 ; news_feed[j].headline[i] != '\0' ; ++i )
 		{
 			gotoxy (( 84 - size )+i , 52 ) ;
 			cout<<news_feed[j].headline[i]<<endl ;
+
+			if ( i >= 4 && i <= size+8 )
+			{
+		    	int swap = 0 ;
+			    while ( news_feed[j].headline[x] != news_feed[j].headline[i] )
+			    {
+			    	x = (rand() % size ) ;
+			    	gotoxy (( 84 - size )+i , 52 ) ;
+			    	cout <<  news_feed[j].headline[x] ;		
+			    	++swap ;
+			    	if ( swap > 5 ) break ;
+			    	Sleep(50) ;
+				}
+				gotoxy (( 84 - size )+i , 52 ) ;
+				cout <<  news_feed[j].headline[i] ;
+			}
+
 			while ( newsPause ) { Sleep (500) ; i = -1 ; }
 
 			Sleep ( 80 ) ;
